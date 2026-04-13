@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BIVA - Premium Virtual Assistance & Internet Services</title>
+  <script src="https://checkout.flutterwave.com/v3.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin:0;
+      background:#fff5f5;
+      color:#333;
+      scroll-behavior:smooth;
+      animation:pageLoad 1.6s ease;
+    }
+
+
+    header {
+      background:linear-gradient(135deg,#8B0000,#ff1a1a);
+      color:#fff;
+      padding:60px 20px;
+      text-align:center;
+      border-bottom:4px solid #b30000;
+      animation:fadeDown 1.4s ease;
+    }
+    header h1 {margin:0; font-size:2.5rem;}
+
+    /* NAV UPDATED TO TOP-LEFT */
+    nav {
+      background:#fff;
+      padding:10px 20px;
+      display:flex;
+      justify-content:flex-start;
+      align-items:center;
+      gap:18px;
+      box-shadow:0 2px 5px rgba(0,0,0,0.1);
+      border-bottom:2px solid #ff1a1a;
+      position:sticky;
+      top:0;
+      z-index:1000;
+      animation:fadeDown 1.6s ease;
+    }
+
+   
+    nav a{margin-right:15px;text-decoration:none;color:#8B0000;font-weight:600;}
+
+
+ #about {
+      animation:aboutPop 1.8s ease;
+      background:#fff;
+      border:2px solid #ffe6e6;
+      border-radius:15px;
+      box-shadow:0 10px 25px rgba(0,0,0,0.05);
+      margin-top:30px;
+    }
+
+    h2 {
+      color:#8B0000;
+      border-left:5px solid #ff1a1a;
+      padding-left:10px;
+    }
+
+    .grid {
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+      gap:25px;
+    }
+
+    .card {
+      background:#fff;
+      padding:15px;
+      border-radius:15px;
+      box-shadow:0 5px 15px rgba(0,0,0,0.05);
+      text-align:center;
+      border:2px solid #ffe6e6;
+      transition:0.3s;
+    }
+
+    .card:hover {border-color:#ff1a1a; transform:translateY(-5px);}
+
+    .media-img {
+      width:100%;
+      height:260px;
+      object-fit:cover;
+      border-radius:10px;
+      cursor:pointer;
+      transition:0.3s;
+    }
+
+    .media-img:hover {transform:scale(1.05);} 
+
+    .btn {
+      display:inline-block;
+      padding:10px 18px;
+      background:#ff1a1a;
+      color:#fff;
+      border-radius:8px;
+      text-decoration:none;
+      margin-top:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+    }
+
+    .btn:hover {background:#b30000;}
+
+    footer {
+      background:#8B0000;
+      color:#fff;
+      text-align:center;
+      padding:20px;
+      border-top:4px solid #ff1a1a;
+    }
+
+    .chat-btn {
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      background:#25D366;
+      color:white;
+      padding:15px;
+      border-radius:50%;
+      font-size:20px;
+      text-decoration:none;
+      box-shadow:0 5px 10px rgba(0,0,0,0.2);
+    }
+
+    .group-title{
+      margin-top:40px;
+      font-size:1.4rem;
+      color:#b30000;
+      font-weight:600;
+      border-bottom:2px solid #ffcccc;
+      padding-bottom:5px;
+    }
+
+
+    @keyframes pageLoad {
+      from {opacity:0; transform:scale(1.03);} 
+      to {opacity:1; transform:scale(1);} 
+    }
+
+    @keyframes fadeUp {
+      from {opacity:0; transform:translateY(40px);} 
+      to {opacity:1; transform:translateY(0);} 
+    }
+
+    @keyframes fadeDown {
+      from {opacity:0; transform:translateY(-40px);} 
+      to {opacity:1; transform:translateY(0);} 
+    }
+
+    @keyframes aboutPop {
+      0% {opacity:0; transform:scale(0.92) translateY(40px);} 
+      100% {opacity:1; transform:scale(1) translateY(0);} 
+    }
+
+    /* ANNOUNCEMENT FIXED */
+    .announcement {
+      margin-top:10px;
+      width:100%;
+      overflow:hidden;
+      background:rgba(0,0,0,0.25);
+      border-radius:25px;
+      padding:4px 0;
+
+    }
+
+    @keyframes scrollText {
+      0% { transform:translateX(100%); }
+      100% { transform:translateX(-100%); }
+    }
+
+
+    /* =======================
+   MOBILE FIXES
+======================= */
+
+* {
+  box-sizing: border-box;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Prevent horizontal scroll */
+html, body {
+  overflow-x: hidden;
+}
+
+/* NAV FIX */
+nav {
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+nav div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.right-nav {
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+/* MAKE BUTTONS STACK BETTER */
+.btn {
+  font-size: 18px;
+  padding: 10px 10px;
+
+}
+
+/* GRID FIX FOR SMALL SCREENS */
+@media (max-width: 768px) {
+
+  header h1 {
+    font-size: 1.6rem;
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav a {
+    display: inline-block;
+    margin: 5px 5px 0 0;
+  }
+
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  section {
+    padding: 25px 15px;
+  }
+
+  .card {
+    width: 100%;
+  }
+
+  .media-img {
+    height: 180px;
+  }
+
+  .modal-content {
+    width: 90%;
+  }
+
+  .right-nav {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  #wallet Balance {
+    font-size: 18px;
+  }
+}
+
+
+/* Floating wallet badge */
+.wallet-float{
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #ff1a1a;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  z-index: 99999;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+
+
+nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  z-index: 9999;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+nav div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.right-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+
+
+
+
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav div,
+  .right-nav {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  nav a {
+    display: inline-block;
+    margin: 5px 5px 0 0;
+  }
+}
+
+
+
+
+
+
+    .btn{background:#ff1a1a;color:#fff;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
+
+    .wallet-box{font-weight:1000;color:indigo;}
+
+    section{padding:50px 20px;max-width:1200px;margin:auto;}
+
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;}
+
+    .card{background:#fff;padding:15px;border-radius:10px;box-shadow:0 3px 10px rgba(0,0,0,0.1);text-align:center;}
+
+    /* FIXED IMAGE SCALE */
+    .media-img{
+      width:100%;
+      height:220px;
+      object-fit:cover;
+      border-radius:10px;
+    }
+
+    .announcement{margin-top:20px;overflow:hidden;background:rgba(0,0,0,0.3);padding:5px;border-radius:20px;}
+    .announcement p{white-space:nowrap;color:white;animation:scroll 25s linear infinite;}
+
+    @keyframes scroll{0%{transform:translateX(100%)}100%{transform:translateX(-100%)}}
+
+.modal{
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.6);
+  justify-content:center;
+  align-items:center;
+  z-index:99999; /* 🔥 ADD THIS */
+}
+
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+  width:300px;
+  position:relative;
+  z-index:100000;
+}
+    input{width:100%;padding:10px;margin:8px 0;}
+  </style>
+</head>
+<body>
+  <h1>..</h1>
+<header>
+
+
+
+  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:130px;border-radius:40px;">
+
+  <h1>Bright International Virtual Assistance</h1>
+  <a class="btn" href="https://lookerstudio.google.com/u/0/reporting/3d71dd76-c386-4a20-99ef-15689299dad7/page/VtLtF">Check Data Balance</a>
+
+
+
+ <div class="announcement">
+
+    <p>🔔 Welcome to BIVA • Note: Our data package only work withing some part of damaturu • Fast Internet • Reliable and Scured • Buy Data Instantly • 24/7 Customer Support • Contact Us Anytime 📞</p>
+  </div>
+
+
+</header>
+
+
+
+<nav>
+
+
+<div>
+  <a href="#about">About</a>
+  <a href="#services">Services</a>
+  <a href="#voucher">Buy Data</a>
+  <a href="#partnership">Partnership</a>
+  <a href="#contact">Contact</a>
+</div>
+
+<div class="right-nav">
+  <button class="btn" onclick="Wallet Balance">Wallet Balance:</span>
+  <span id="wallet" class="wallet-box">₦0</span>
+</div>
+
+
+
+  <div class="right-nav">
+
+
+
+
+    <button class="btn" onclick="fundWallet()">Fund Wallet</button>
+    <button class="btn" id="loginBtn" onclick="openModal()">Login</button>
+    <button class="btn" id="logoutBtn" onclick="logout()" style="display:none">Logout</button>
+
+   
+
+    <span class="btn">User:</span> 
+    <span id="userEmail" style="margin-right:10px;font-weight:600;color:Red;"></span>
+
+    <span id="lastVoucher" style="margin-left:10px;font-weight:600;color:#8B0000;"></span>
+
+</nav>
+
+
+<!-- MODAL -->
+<div class="modal" id="modal">
+  <div class="modal-content">
+    <h3>Login / Signup</h3>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+    <button class="btn" onclick="signup()">Signup</button>
+    <button class="btn" onclick="login()">Login</button>
+    <button class="btn" onclick="closeModal()" style="background:gray">Close</button>
+</div>
+</div>
+
+<section id="about">
+  <h2>About Us</h2>
+  <p><strong>Bright International Virtual Assistance (BIVA)</strong> is a fully registered digital service and internet solutions company committed to delivering reliable, affordable, and high-quality virtual assistance and internet services across Nigeria and beyond.</p>
+  <p>We specialize in providing seamless connectivity solutions, internet voucher services, and professional virtual support for individuals, small businesses, and corporate organizations. Our goal is to help clients stay connected, productive, and efficient in today’s fast-paced digital world.</p>
+  <p>At BIVA, we believe that access to the internet and professional support services should be simple, fast, and affordable. That is why we continuously improve our infrastructure, customer service, and service delivery to ensure maximum satisfaction for all our users.</p>
+  <p>We are also deeply committed to customer satisfaction, offering 24/7 support and ensuring that every client receives timely assistance whenever needed. Whether you are purchasing data vouchers, managing online tasks, or seeking technical support, BIVA is your trusted digital partner.</p>
+  <p><em>Our vision is to become one of the leading virtual assistance and internet service providers in Africa, empowering individuals and businesses through reliable digital connectivity and support solutions.</em></p>
+</section>
+
+
+<section>
+  <h2>Why Choose Us</h2>
+  <div class="grid">
+    <div class="card"><h3>⚡ Fast Internet</h3><p>Reliable high-speed connectivity.</p></div>
+    <div class="card"><h3>💰 Affordable</h3><p>Flexible plans for everyone.</p></div>
+    <div class="card"><h3>📞 24/7 Support</h3><p>Always available to assist you.</p></div>
+  </div>
+</section>
+
+
+<section id="services">
+  <h2>Our Services</h2>
+  <div class="grid">
+    <div class="card"><h3>Administrative Support</h3></div>
+    <div class="card"><h3>Customer Support</h3></div>
+    <div class="card"><h3>Social Media Management</h3></div>
+    <div class="card"><h3>Data Entry</h3></div>
+    <div class="card"><h3>Voucher Sales</h3></div>
+    <div class="card"><h3>Network Support</h3></div>
+  </div>
+</section>
+
+
+<section id="media">
+  <h2>Highlights</h2>
+  <div class="grid">
+    <div class="card"><img class="media-img" src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1775820063/1_u1x1if.png"></div>
+    <div class="card"><img class="media-img" src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1775820063/4_mjckpu.png"></div>
+    <div class="card"><img class="media-img" src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1775820066/6_ho3ubp.png"></div>
+  </div>
+</section>
+
+<section id="voucher">
+  <h2>Buy Data</h2>
+  <div id="plans"></div>
+</section>
+
+<section id="transactions">
+  <h2>Transaction History</h2>
+  <div id="transactionList" class="card" style="text-align:left;max-height:300px;overflow:auto;"></div>
+</section>
+
+
+<section id="partnership">
+  <h2>Partnership Program</h2>
+  <div class="card" style="text-align:left;padding:20px;">
+    <p>Join the BIVA Partnership Program and earn income by reselling internet vouchers.</p>
+    <a class="btn" href="https://form.jotform.com/260963343803054" target="_blank">Apply for Partnership</a>
+  </div>
+</section>
+
+
+
+<section id="contact">
+  <h2>Contact</h2>
+  <p>Email: brightinternationaldamaturu@gmail.com</p>
+  <p>Phone: +234 080 3780 7558</p>
+</section>
+
+<footer>
+  <p>© 2026 BIVA. All Rights Reserved.</p>
+</footer>
+
+<a class="chat-btn" href="https://wa.me/2348037807558" target="_blank">💬</a>
+
+
+<div id="customAlert" style="position:fixed;top:20px;right:20px;z-index:9999;"></div>
+
+
+
+<script>
+
+
+function showAlert(message, type="success"){
+  const alertBox = document.createElement("div");
+
+  let bg = "#28a745"; // success
+  if(type === "error") bg = "#dc3545";
+  if(type === "warning") bg = "#ffc107";
+
+  alertBox.style.background = bg;
+  alertBox.style.color = "#fff";
+  alertBox.style.padding = "12px 18px";
+  alertBox.style.marginTop = "10px";
+  alertBox.style.borderRadius = "8px";
+  alertBox.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+  alertBox.style.fontWeight = "600";
+  alertBox.innerText = message;
+
+  document.getElementById("customAlert").appendChild(alertBox);
+
+  setTimeout(()=>{ alertBox.remove(); }, 4000);
+}
+
+
+
+const firebaseConfig={apiKey:"AIzaSyDaZH5kn_mmxap3jOyw3Yhq55d936Jhl0g",authDomain:"biva-system.firebaseapp.com",projectId:"biva-system"};
+firebase.initializeApp(firebaseConfig);
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+function openModal(){document.getElementById('modal').style.display='flex'}
+function closeModal(){document.getElementById('modal').style.display='none'}
+
+function signup(){
+  const emailVal = document.getElementById('email').value;
+  const passwordVal = document.getElementById('password').value;
+
+  auth.createUserWithEmailAndPassword(emailVal,passwordVal)
+  .then(u=>{
+    return db.collection('users').doc(u.user.uid).set({wallet:0});
+  })
+  .then(()=>{
+    showAlert('Account created successfully');
+  })
+  .catch(err=>alert(err.message));
+}
+
+
+
+
+function fundWallet(){
+  if(!currentUser){
+    showAlert("Please login first");
+    return;
+  }
+
+  let amount = prompt("Enter amount to fund (₦):");
+
+  if(!amount || amount <= 0){
+    showAlert("Invalid amount");
+    return;
+  }
+
+  FlutterwaveCheckout({
+    public_key: "FLWPUBK-36d9a62ddae2728dbd0beebf3c3cb99b-X",
+    tx_ref: "BIVA_" + Date.now(),
+    amount: amount,
+    currency: "NGN",
+    payment_options: "card,banktransfer,ussd",
+    customer: {
+      email: currentUser.email,
+    },
+
+    callback: async function (response) {
+
+      if(response.status === "completed"){  // ✅ FIXED
+
+        const txRef = response.tx_ref;
+        const paymentRef = db.collection("payments").doc(txRef);
+
+        const paymentDoc = await paymentRef.get();
+
+        // 🔒 Prevent double credit
+        if(paymentDoc.exists && paymentDoc.data().status === "completed"){
+          showAlert("⚠️ Payment already processed");
+          return;
+        }
+
+        // Save payment
+        await paymentRef.set({
+          userId: currentUser.uid,
+          amount: parseFloat(amount),
+          status: "completed",
+          createdAt: new Date()
+        });
+
+        // Credit wallet ONCE
+        const userRef = db.collection("users").doc(currentUser.uid);
+        const userDoc = await userRef.get();
+
+        let bal = userDoc.data().wallet || 0;
+
+        await userRef.update({
+          wallet: bal + parseFloat(amount)
+        });
+
+        showAlert("✅ Wallet funded successfully!");
+
+      } else {
+        showAlert("Payment failed");
+      }
+    },
+
+    onclose: function(){
+      console.log("Payment closed");
+    }
+
+  }); // ✅ VERY IMPORTANT (closing bracket)
+}
+
+
+
+function login(){
+  const emailVal = document.getElementById('email').value;
+  const passwordVal = document.getElementById('password').value;
+
+  auth.signInWithEmailAndPassword(emailVal,passwordVal)
+  .then(()=>{
+    showAlert('Login successful');
+    closeModal();
+  })
+  .catch(err=>alert(err.message));
+}
+function logout(){auth.signOut();}
+
+// WALLET LIVE UPDATE
+let currentUser=null;
+const wallet = document.getElementById('wallet');
+const loginBtn = document.getElementById('loginBtn');
+const logoutBtn = document.getElementById('logoutBtn');
+auth.onAuthStateChanged(user=>{
+  currentUser=user;
+  if(user){
+    loginBtn.style.display='none';
+    logoutBtn.style.display='block';
+    document.getElementById("userEmail").innerText = user.email;
+
+    db.collection('users').doc(user.uid).onSnapshot(doc=>{
+
+const voucherEl = document.getElementById("lastVoucher");
+
+if(doc.exists){
+  wallet.innerText = '₦' + (doc.data().wallet || 0);
+
+  // SHOW LAST VOUCHER
+  voucherEl.innerText = doc.data().lastVoucher
+    ? "Last Purchased Voucher: " + doc.data().lastVoucher
+    : "";
+}
+
+      if(doc.exists){
+        wallet.innerText='₦'+(doc.data().wallet || 0);
+      }else{
+        wallet.innerText='₦0';
+	document.getElementById("userEmail").innerText = "";
+      }
+    });
+  }else{
+    wallet.innerText='₦0';
+    loginBtn.style.display='block';
+    logoutBtn.style.display='none';
+  }
+});
+
+// DATA PLANS
+const plansDiv = document.getElementById("plans");
+const plans=[{price:150,desc:'1GB'},{price:300,desc:'2GB'},{price:450,desc:'3GB'},{price:600,desc:'4GB'},{price:900,desc:'6GB'},{price:1050,desc:'7GB'},{price:1200,desc:'8GB'},{price:1500,desc:'10GB'},{price:2250,desc:'15GB'},{price:3000,desc:'20GB'},{price:3750,desc:'25GB'},{price:5400,desc:'36GB'},{price:8150,desc:'65GB'},{price:15000,desc:'100GB'},{price:16500,desc:'120GB'},{price:17500,desc:'150GB'},{price:25000,desc:'200GB'},{price:30000,desc:'Unlimited'},];
+
+plans.forEach(p=>{
+  plansDiv.classList.add("grid");
+plansDiv.innerHTML += `
+  <div class="card">
+  <h3>₦${p.price}</h3>
+  <p>${p.desc}</p>
+  <button class='btn' onclick="buy(${p.price}, '${p.desc}')">Buy</button>
+  </div>`;
+});
+
+// BUY WITH WALLET
+async function buy(price, plan){
+  if(!currentUser){
+    showAlert('Login first');
+    return;
+  }
+
+  const ref = db.collection('users').doc(currentUser.uid);
+
+  try {
+    const doc = await ref.get();
+
+    if(!doc.exists){
+      showAlert('User wallet not found');
+      return;
+    }
+
+    let bal = doc.data().wallet || 0;
+
+    if(bal < price){
+      showAlert('Insufficient balance. Please fund your wallet.');
+      return;
+    }
+
+    // 1. Deduct wallet
+    await ref.update({ wallet: bal - price });
+
+    // 2. CALL WEBHOOK HERE (IMPORTANT)
+    const res = await fetch("https://hook.us2.make.com/pm61x9gphx81e59lrvy1q7tmnfsd7ggo", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        plan: plan,
+        price: price,
+        email: currentUser.email
+      })
+    });
+
+    const data = await res.json().catch(() => ({}));
+
+    const voucher = data.voucher || "Processing...";
+
+// SAVE LAST VOUCHER TO FIRESTORE
+await db.collection("users").doc(currentUser.uid).update({
+  lastVoucher: voucher
+});
+
+showAlert("✅ Purchase successful! Voucher: " + voucher);
+
+  } catch(err){
+    showAlert("Error: " + err.message);
+  }
+}
+
+
+
+</script>
+
+</body>
+</html>
