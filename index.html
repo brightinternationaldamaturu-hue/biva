@@ -277,15 +277,16 @@ nav div {
 /* Floating wallet badge */
 .wallet-float{
   position: fixed;
-  top: 10px;
+  top: 70px; /* below your fixed nav */
   right: 10px;
   background: #ff1a1a;
   color: #fff;
-  padding: 8px 12px;
+  padding: 8px 14px;
   border-radius: 20px;
   font-weight: bold;
   z-index: 99999;
   box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  font-size: 14px;
 }
 
 
@@ -347,7 +348,7 @@ nav div {
 
     .btn{background:#ff1a1a;color:#fff;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
 
-    .wallet-box{font-weight:850;color:Lime;}
+    .wallet-box{font-weight:1;color:white;}
 
     section{padding:50px 20px;max-width:1200px;margin:auto;}
 
@@ -412,8 +413,10 @@ nav div {
 </header>
 
 
-
 <nav>
+<div id="walletFloat" class="wallet-float">
+  ₦0
+</div>
 
 
 <div>
@@ -427,7 +430,7 @@ nav div {
 
 
 <div class="right-nav">
-  <button class="btn" onclick="Wallet">Wallet:</span>
+
   <span id="wallet" class="wallet-box">₦0</span>
 
     <button class="btn" onclick="fundWallet()">Fund Wallet</button>
@@ -539,6 +542,8 @@ nav div {
 
 
 <script>
+
+const walletFloat = document.getElementById('walletFloat');
 
 
 function showAlert(message, type="success"){
@@ -691,7 +696,10 @@ auth.onAuthStateChanged(user=>{
 const voucherEl = document.getElementById("lastVoucher");
 
 if(doc.exists){
-  wallet.innerText = '₦' + (doc.data().wallet || 0);
+  const balance = doc.data().wallet || 0;
+
+wallet.innerText = '₦' + balance;
+walletFloat.innerText = '₦' + balance;
 
   // SHOW LAST VOUCHER
   voucherEl.innerText = doc.data().lastVoucher
