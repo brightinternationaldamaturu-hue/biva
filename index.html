@@ -347,7 +347,7 @@ nav div {
 
     .btn{background:#ff1a1a;color:#fff;padding:8px 12px;border:none;border-radius:6px;cursor:pointer;font-weight:600;}
 
-    .wallet-box{font-weight:1000;color:indigo;}
+    .wallet-box{font-weight:850;color:Lime;}
 
     section{padding:50px 20px;max-width:1200px;margin:auto;}
 
@@ -423,31 +423,23 @@ nav div {
   <a href="#services">Services</a>
   <a href="#voucher">Buy Data</a>
   <a href="#partnership">Partnership</a>
-  <a href="#contact">Contact</a>
+  <a href="#User">Profile</a>
+  <span id="lastVoucher" style="margin-left:10px;font-weight:600;color:Green;"></span>
 </div>
+
+
 
 <div class="right-nav">
   <button class="btn" onclick="Wallet Balance">Wallet Balance:</span>
   <span id="wallet" class="wallet-box">₦0</span>
+
+    <button class="btn" onclick="fundWallet()">Fund Wallet</button>
+    <button class="btn" id="loginBtn" onclick="openModal()">Login</button>
 </div>
 
 
 
-  <div class="right-nav">
-
-
-
-
-    <button class="btn" onclick="fundWallet()">Fund Wallet</button>
-    <button class="btn" id="loginBtn" onclick="openModal()">Login</button>
-    <button class="btn" id="logoutBtn" onclick="logout()" style="display:none">Logout</button>
-
    
-
-    <span class="btn">User:</span> 
-    <span id="userEmail" style="margin-right:10px;font-weight:600;color:Red;"></span>
-
-    <span id="lastVoucher" style="margin-left:10px;font-weight:600;color:#8B0000;"></span>
 
 </nav>
 
@@ -463,6 +455,7 @@ nav div {
     <button class="btn" onclick="closeModal()" style="background:gray">Close</button>
 </div>
 </div>
+
 
 <section id="about">
   <h2>About Us</h2>
@@ -527,14 +520,19 @@ nav div {
 
 
 
-<section id="contact">
-  <h2>Contact</h2>
-  <p>Email: brightinternationaldamaturu@gmail.com</p>
-  <p>Phone: +234 080 3780 7558</p>
+<section id="User">
+  <h2>User</h2>
+
+    <span class=" ">User:</span> 
+    <span id="userEmail" style="margin-right:10px;font-weight:600;color:Red;"></span>
+    <button class="btn" id="logoutBtn" onclick="logout()" style="display:none">Logout</button>
 </section>
+
 
 <footer>
   <p>© 2026 BIVA. All Rights Reserved.</p>
+  <p>Email: brightinternationaldamaturu@gmail.com</p>
+  <p>Phone: +234 080 3780 7558</p>
 </footer>
 
 <a class="chat-btn" href="https://wa.me/2348037807558" target="_blank">💬</a>
