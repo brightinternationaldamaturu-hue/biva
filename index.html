@@ -649,6 +649,15 @@ function fundWallet(){
         await userRef.update({
           wallet: bal + parseFloat(amount)
         });
+        
+
+await db.collection("transactions").add({
+  userId: currentUser.uid,
+  email: currentUser.email,
+  amount: parseFloat(amount),
+  type: "fund",
+  createdAt: new Date()
+});
 
         showAlert("✅ Wallet funded successfully!");
 
@@ -684,42 +693,52 @@ let currentUser=null;
 const wallet = document.getElementById('wallet');
 const loginBtn = document.getElementById('loginBtn');
 const logoutBtn = document.getElementById('logoutBtn');
-auth.onAuthStateChanged(user=>{
-  currentUser=user;
-  if(user){
-    loginBtn.style.display='none';
-    logoutBtn.style.display='block';
+
+
+
+auth.onAuthStateChanged(user => {
+  currentUser = user;
+
+  if (user) {
+    loginBtn.style.display = 'none';
+    logoutBtn.style.display = 'block';
     document.getElementById("userEmail").innerText = user.email;
 
-    db.collection('users').doc(user.uid).onSnapshot(doc=>{
+    loadTransactions(user.uid);
 
-const voucherEl = document.getElementById("lastVoucher");
+    db.collection('users').doc(user.uid).onSnapshot(doc => {
+      const voucherEl = document.getElementById("lastVoucher");
 
-if(doc.exists){
-  const balance = doc.data().wallet || 0;
+      if (doc.exists) {
+        const balance = doc.data().wallet || 0;
 
-wallet.innerText = '₦' + balance;
-walletFloat.innerText = '₦' + balance;
+        wallet.innerText = '₦' + balance;
+        walletFloat.innerText = '₦' + balance;
 
-  // SHOW LAST VOUCHER
-  voucherEl.innerText = doc.data().lastVoucher
-    ? "Last Purchased Voucher: " + doc.data().lastVoucher
-    : "";
-}
-
-      if(doc.exists){
-        wallet.innerText='₦'+(doc.data().wallet || 0);
-      }else{
-        wallet.innerText='₦0';
-	document.getElementById("userEmail").innerText = "";
+        voucherEl.innerText = doc.data().lastVoucher
+          ? "Last Purchased Voucher: " + doc.data().lastVoucher
+          : "";
+      } else {
+        wallet.innerText = '₦0';
+        walletFloat.innerText = '₦0';
+        document.getElementById("userEmail").innerText = "";
       }
     });
-  }else{
-    wallet.innerText='₦0';
-    loginBtn.style.display='block';
-    logoutBtn.style.display='none';
+
+  } else {
+    currentUser = null;
+    wallet.innerText = '₦0';
+    walletFloat.innerText = '₦0';
+
+    loginBtn.style.display = 'block';
+    logoutBtn.style.display = 'none';
+
+    document.getElementById("userEmail").innerText = "";
+    document.getElementById("transactionList").innerHTML = "";
   }
 });
+
+
 
 // DATA PLANS
 const plansDiv = document.getElementById("plans");
@@ -731,7 +750,7 @@ plansDiv.innerHTML += `
   <div class="card">
   <h3>₦${p.price}</h3>
   <p>${p.desc}</p>
-  <button class='btn' onclick="buy(${p.price}, '${p.desc}')">Buy</button>
+  <button class='btn' onclick="openConfirm(${p.price}, '${p.desc}')">Buy</button>
   </div>`;
 });
 
@@ -784,6 +803,16 @@ await db.collection("users").doc(currentUser.uid).update({
   lastVoucher: voucher
 });
 
+// SAVE TRANSACTION
+await db.collection("transactions").add({
+  userId: currentUser.uid,
+  email: currentUser.email,
+  plan: plan,
+  price: price,
+  voucher: voucher,
+  type: "purchase",
+  createdAt: new Date()
+});
 showAlert("✅ Purchase successful! Voucher: " + voucher);
 
   } catch(err){
@@ -793,7 +822,87 @@ showAlert("✅ Purchase successful! Voucher: " + voucher);
 
 
 
+
+
+function loadTransactions(uid){
+  const list = document.getElementById("transactionList");
+
+  db.collection("transactions")
+    .where("userId", "==", uid)
+    .where("type", "==", "purchase")
+    .orderBy("createdAt", "desc")
+    .onSnapshot(snapshot => {
+
+      list.innerHTML = "";
+
+      if(snapshot.empty){
+        list.innerHTML = "<p>No data purchase history yet.</p>";
+        return;
+      }
+
+      snapshot.forEach(doc => {
+        const t = doc.data();
+
+        const date = t.createdAt?.toDate
+          ? t.createdAt.toDate().toLocaleString()
+          : "Just now";
+
+        list.innerHTML += `
+          <div style="border-bottom:1px solid #eee;padding:10px 0;">
+            <strong>📦 ${t.plan}</strong><br>
+            💰 ₦${t.price}<br>
+            🎟️ Voucher: ${t.voucher || "Processing..."}<br>
+            🕒 ${date}
+          </div>
+        `;
+      });
+
+    });
+}
+
+
+
+let selectedPlan = null;
+let selectedPrice = null;
+
+function openConfirm(price, plan){
+  selectedPlan = plan;
+  selectedPrice = price;
+
+  document.getElementById("confirmText").innerText =
+    `Do you want to buy ${plan} for ₦${price}?`;
+
+  document.getElementById("confirmBox").style.display = "flex";
+}
+
+function closeConfirm(){
+  document.getElementById("confirmBox").style.display = "none";
+}
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  document.getElementById("confirmYes").addEventListener("click", function () {
+    closeConfirm();
+    buy(selectedPrice, selectedPlan);
+  });
+});
+
+
+
 </script>
+
+
+<div id="confirmBox" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Confirm Purchase</h3>
+
+    <p id="confirmText"></p>
+
+    <button class="btn" id="confirmYes">Yes, Buy</button>
+    <button class="btn" onclick="closeConfirm()" style="background:gray">Cancel</button>
+  </div>
+</div>
+
 
 </body>
 </html>
