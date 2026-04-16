@@ -467,7 +467,14 @@ body {
   <div class="modal-content">
     <h3>Login / Signup</h3>
     <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <div style="position:relative;">
+  <input id="password" type="password" placeholder="Password" style="padding-right:40px;">
+  
+  <span onclick="togglePassword()" 
+        style="position:absolute; right:10px; top:50%; transform:translateY(-50%); cursor:pointer;">
+    👁️
+  </span>
+</div>
     <button class="btn" onclick="signup()">Signup</button>
     <button class="btn" onclick="login()">Login</button>
     <button class="btn" onclick="closeModal()" style="background:gray">Close</button>
@@ -920,6 +927,18 @@ function scrollToWallet(){
 function scrollToWallet(){
   document.getElementById("User").scrollIntoView({behavior:"smooth"});
 }
+
+function togglePassword(){
+  const passwordInput = document.getElementById("password");
+
+  if(passwordInput.type === "password"){
+    passwordInput.type = "text";
+  } else {
+    passwordInput.type = "password";
+  }
+}
+
+
 </script>
 
 
