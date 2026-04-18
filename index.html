@@ -17,6 +17,11 @@
 
 
   <style>
+
+
+
+
+
     body {
       font-family: 'Poppins', sans-serif;
       margin:0;
@@ -1066,18 +1071,23 @@ function closeReceipt(){
   document.getElementById("receiptOverlay").style.display = "none";
 }
 
+
+
+
 function printReceipt(){
   const receiptHTML = `
-    <div class="receipt">
-      <h3>BIVA RECEIPT</h3>
+    <div style="width:58mm;font-family:monospace;font-size:12px;">
+      <h3 style="text-align:center;margin:5px 0;">BIVA RECEIPT</h3>
       <hr>
+
       <p>Email: ${document.getElementById("r_email").innerText}</p>
       <p>Plan: ${document.getElementById("r_plan").innerText}</p>
       <p>Amount: ₦${document.getElementById("r_price").innerText}</p>
       <p>Voucher: ${document.getElementById("r_voucher").innerText}</p>
       <p>Date: ${document.getElementById("r_date").innerText}</p>
+
       <hr>
-      <p style="text-align:center;">Thank you for using BIVA</p>
+      <p style="text-align:center;">Thank you for connecting with BIVA</p>
     </div>
   `;
 
@@ -1087,39 +1097,17 @@ function printReceipt(){
     <html>
       <head>
         <title>Receipt</title>
-
         <style>
-          @page {
-            size: 58mm auto;
-            margin: 0;
-          }
-
+          @page { size: 58mm auto; margin: 0; }
           body {
+            width: 58mm;
             margin: 0;
             padding: 10px;
             font-family: monospace;
-            width: 58mm;
           }
-
-          .receipt {
-            width: 58mm;
-            font-size: 12px;
-          }
-
-          h3 {
-            text-align: center;
-            margin: 5px 0;
-            font-size: 14px;
-          }
-
           hr {
             border: none;
             border-top: 1px dashed #000;
-            margin: 5px 0;
-          }
-
-          p {
-            margin: 3px 0;
           }
         </style>
       </head>
@@ -1133,6 +1121,11 @@ function printReceipt(){
   printWindow.document.close();
 }
 
+
+
+
+
+
 function downloadReceipt(){
   const content = document.querySelector("#receiptOverlay").innerText;
 
@@ -1142,6 +1135,7 @@ function downloadReceipt(){
   link.href = URL.createObjectURL(blob);
   link.download = "BIVA-Receipt.txt";
   link.click();
+
 }
 
 
@@ -1216,6 +1210,19 @@ function openBalance(){
     <button class="btn" style="background:gray;width:100%;margin-top:10px;" onclick="closeReceipt()">Close</button>
 
   </div>
+</div>
+
+
+
+  <h3 style="text-align:center;">BIVA</h3>
+  --------------------
+  Email: <span id="r_email"></span><br>
+  Plan: <span id="r_plan"></span><br>
+  Amount: ₦<span id="r_price"></span><br>
+  Voucher: <span id="r_voucher"></span><br>
+  Date: <span id="r_date"></span><br>
+  --------------------
+  Thank you
 </div>
 
 
