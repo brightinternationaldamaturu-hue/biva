@@ -475,8 +475,8 @@ body {
     👁️
   </span>
 </div>
-    <button class="btn" onclick="signup()">Signup</button>
-    <button class="btn" onclick="login()">Login</button>
+    <button class="btn" id="signupBtn" onclick="signup()">Signup</button>
+    <button class="btn" id="loginBtnModal" onclick="login()">Login</button>
     <button class="btn" onclick="closeModal()" style="background:gray">Close</button>
 </div>
 </div>
@@ -607,18 +607,40 @@ const db=firebase.firestore();
 function openModal(){document.getElementById('modal').style.display='flex'}
 function closeModal(){document.getElementById('modal').style.display='none'}
 
-function signup(){
-  const emailVal = document.getElementById('email').value;
-  const passwordVal = document.getElementById('password').value;
 
-  auth.createUserWithEmailAndPassword(emailVal,passwordVal)
-  .then(u=>{
-    return db.collection('users').doc(u.user.uid).set({wallet:0});
-  })
-  .then(()=>{
-    showAlert('Account created successfully');
-  })
-  .catch(err=>alert(err.message));
+
+async function signup(){
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  if(!email || !password){
+    showAlert("Please fill all fields", "warning");
+    return;
+  }
+
+  if(password.length < 6){
+    showAlert("Password must be at least 6 characters", "warning");
+    return;
+  }
+
+  try{
+    const cred = await auth.createUserWithEmailAndPassword(email, password);
+    const user = cred.user;
+
+    // ✅ Save user properly
+    await db.collection("users").doc(user.uid).set({
+      email: user.email,
+      wallet: 0,
+      blocked: false,
+      createdAt: new Date()
+    });
+
+    showAlert("✅ Account created successfully!");
+    closeModal();
+
+  }catch(err){
+    showAlert(err.message, "error");
+  }
 }
 
 
@@ -705,18 +727,53 @@ await db.collection("transactions").add({
 
 
 
-function login(){
-  const emailVal = document.getElementById('email').value;
-  const passwordVal = document.getElementById('password').value;
+async function login(){
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
 
-  auth.signInWithEmailAndPassword(emailVal,passwordVal)
-  .then(()=>{
-    showAlert('Login successful');
+  if(!email || !password){
+    showAlert("Enter email and password", "warning");
+    return;
+  }
+
+  try{
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    const ref = db.collection("users").doc(user.uid);
+    const doc = await ref.get();
+
+    // ✅ If user doc missing, create it
+    if(!doc.exists){
+      await ref.set({
+        email: user.email,
+        wallet: 0,
+        blocked: false,
+        createdAt: new Date()
+      });
+    }
+
+    showAlert("✅ Login successful");
     closeModal();
-  })
-  .catch(err=>alert(err.message));
+
+  }catch(err){
+    showAlert(err.message, "error");
+  }
 }
-function logout(){auth.signOut();}
+
+
+
+
+function logout(){
+  auth.signOut()
+    .then(() => {
+      showAlert("Logged out successfully");
+    })
+    .catch(err => {
+      showAlert("Error: " + err.message);
+    });
+}
+
 
 // WALLET LIVE UPDATE
 let currentUser=null;
@@ -741,6 +798,18 @@ auth.onAuthStateChanged(user => {
 
       if (doc.exists) {
         const balance = doc.data().wallet || 0;
+
+
+const userRef = db.collection("users").doc(user.uid);
+
+userRef.get().then(doc => {
+if (doc.exists && doc.data().blocked === true) {
+  auth.signOut();
+  showAlert("❌ Your account has been blocked", "error");
+  return;
+}
+});
+
 
         wallet.innerText = '₦' + balance;
         walletFloat.innerText = '₦' + balance;
@@ -804,14 +873,11 @@ async function buy(price, plan){
     let bal = doc.data().wallet || 0;
 
     if(bal < price){
-      showAlert('Insufficient balance. Please fund your wallet.');
+      showAlert('Insufficient balance');
       return;
     }
 
-    // 1. Deduct wallet
-    await ref.update({ wallet: bal - price });
-
-    // 2. CALL WEBHOOK HERE (IMPORTANT)
+    // 🔥 STEP 1: CALL WEBHOOK FIRST
     const res = await fetch("https://hook.us2.make.com/pm61x9gphx81e59lrvy1q7tmnfsd7ggo", {
       method: "POST",
       headers: {
@@ -824,29 +890,45 @@ async function buy(price, plan){
       })
     });
 
+    // ❌ If webhook fails
+    if(!res.ok){
+      throw new Error("Server error. Try again.");
+    }
+
     const data = await res.json().catch(() => ({}));
 
-    const voucher = data.voucher || "Processing...";
+    const voucher = data.voucher;
 
-// SAVE LAST VOUCHER TO FIRESTORE
-await db.collection("users").doc(currentUser.uid).update({
-  lastVoucher: voucher
-});
+    // ❌ If NO voucher returned
+    if(!voucher){
+      throw new Error("Voucher not received. Try again.");
+    }
 
-// SAVE TRANSACTION
-await db.collection("transactions").add({
-  userId: currentUser.uid,
-  email: currentUser.email,
-  plan: plan,
-  price: price,
-  voucher: voucher,
-  type: "purchase",
-  createdAt: new Date()
-});
-showAlert("✅ Purchase successful! Voucher: " + voucher);
+    // ✅ STEP 2: NOW deduct wallet
+    await ref.update({
+      wallet: bal - price
+    });
+
+    // ✅ STEP 3: Save voucher
+    await db.collection("users").doc(currentUser.uid).update({
+      lastVoucher: voucher
+    });
+
+    // ✅ STEP 4: Save transaction
+    await db.collection("transactions").add({
+      userId: currentUser.uid,
+      email: currentUser.email,
+      plan: plan,
+      price: price,
+      voucher: voucher,
+      type: "purchase",
+      createdAt: new Date()
+    });
+
+    showAlert("✅ Purchase successful! Voucher: " + voucher);
 
   } catch(err){
-    showAlert("Error: " + err.message);
+    showAlert("❌ " + err.message, "error");
   }
 }
 
@@ -937,6 +1019,23 @@ function togglePassword(){
     passwordInput.type = "password";
   }
 }
+
+
+
+
+function setLoading(btnId, loading=true){
+  const btn = document.getElementById(btnId);
+  if(!btn) return;
+
+  btn.disabled = loading;
+  btn.innerText = loading ? "Please wait..." : btn.getAttribute("data-text");
+}
+
+// store original text
+document.getElementById("signupBtn")?.setAttribute("data-text","Signup");
+document.getElementById("loginBtnModal")?.setAttribute("data-text","Login");
+
+
 
 
 </script>
