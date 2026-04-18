@@ -740,6 +740,13 @@ async function login(){
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
+ // FORCE refresh current user
+    await user.reload();
+
+    document.getElementById("userEmail").innerText = user.email;
+
+
+
     const ref = db.collection("users").doc(user.uid);
     const doc = await ref.get();
 
