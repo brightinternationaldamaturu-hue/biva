@@ -423,8 +423,7 @@ body {
 
 
   <h1>(BIVA)</h1>
-  <a class="btn" href="https://lookerstudio.google.com/u/0/reporting/3d71dd76-c386-4a20-99ef-15689299dad7/page/VtLtF">Check Data Balance</a>
-
+<button class="btn" onclick="openBalance()">Check Data Balance</button>
 
 
  <div class="announcement">
@@ -932,7 +931,15 @@ async function buy(price, plan){
       createdAt: new Date()
     });
 
-    showAlert("✅ Purchase successful! Voucher: " + voucher);
+    showAlert("✅ Purchase successful!");
+
+// 🔥 Trigger print
+printVoucher({
+  email: currentUser.email,
+  plan: plan,
+  price: price,
+  voucher: voucher
+});
 
   } catch(err){
     showAlert("❌ " + err.message, "error");
@@ -958,26 +965,28 @@ function loadTransactions(uid){
         return;
       }
 
-      snapshot.forEach(doc => {
-        const t = doc.data();
+snapshot.forEach(doc => {
+  const t = doc.data();
 
-        const date = t.createdAt?.toDate
-          ? t.createdAt.toDate().toLocaleString()
-          : "Just now";
+  const date = t.createdAt?.toDate
+    ? t.createdAt.toDate().toLocaleString()
+    : "Just now";
 
-        list.innerHTML += `
-          <div style="border-bottom:1px solid #eee;padding:10px 0;">
-            <strong>📦 ${t.plan}</strong><br>
-            💰 ₦${t.price}<br>
-            🎟️ Voucher: ${t.voucher || "Processing..."}<br>
-            🕒 ${date}
-          </div>
-        `;
-      });
+  list.innerHTML += `
+    <div style="border-bottom:1px solid #eee;padding:10px 0;">
+      <strong>📦 ${t.plan}</strong><br>
+      💰 ₦${t.price}<br>
+      🎟️ Voucher: ${t.voucher || "Processing..."}<br>
+      🕒 ${date}<br><br>
 
-    });
+      <button onclick='printVoucher(${JSON.stringify(t)})'>🖨 Print</button>
+    </div>
+  `;
+});
+
+// 🔥 THESE WERE MISSING
+});
 }
-
 
 
 let selectedPlan = null;
@@ -1045,6 +1054,60 @@ document.getElementById("loginBtnModal")?.setAttribute("data-text","Login");
 
 
 
+
+function printVoucher(data){
+  document.getElementById("r_email").innerText = data.email;
+  document.getElementById("r_plan").innerText = data.plan;
+  document.getElementById("r_price").innerText = data.price;
+  document.getElementById("r_voucher").innerText = data.voucher;
+  document.getElementById("r_date").innerText = new Date().toLocaleString();
+
+  document.getElementById("receiptOverlay").style.display = "flex";
+}
+
+
+
+function closeReceipt(){
+  document.getElementById("receiptOverlay").style.display = "none";
+}
+
+function printReceipt(){
+  const content = document.querySelector("#receiptOverlay > div").innerHTML;
+
+  const win = window.open('', '', 'width=400,height=600');
+  win.document.write(`<html><body>${content}</body></html>`);
+  win.document.close();
+  win.print();
+}
+
+function downloadReceipt(){
+  const content = document.querySelector("#receiptOverlay").innerText;
+
+  const blob = new Blob([content], { type: "text/plain" });
+  const link = document.createElement("a");
+
+  link.href = URL.createObjectURL(blob);
+  link.download = "BIVA-Receipt.txt";
+  link.click();
+}
+
+
+
+
+
+
+
+
+
+function openBalance(){
+  window.open("https://lookerstudio.google.com/...", "_blank");
+}
+
+
+
+
+
+
 </script>
 
 
@@ -1058,6 +1121,52 @@ document.getElementById("loginBtnModal")?.setAttribute("data-text","Login");
     <button class="btn" onclick="closeConfirm()" style="background:gray">Cancel</button>
   </div>
 </div>
+
+
+
+<!-- FULL SCREEN RECEIPT OVERLAY -->
+<div id="receiptOverlay" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.85);
+  z-index:999999;
+  justify-content:center;
+  align-items:center;
+">
+
+  <div style="
+    background:#fff;
+    width:90%;
+    max-width:400px;
+    border-radius:12px;
+    padding:20px;
+    text-align:left;
+  ">
+
+    <h2 style="color:#8B0000;text-align:center;">BIVA Receipt</h2>
+
+    <p><strong>Email:</strong> <span id="r_email"></span></p>
+    <p><strong>Plan:</strong> <span id="r_plan"></span></p>
+    <p><strong>Amount:</strong> ₦<span id="r_price"></span></p>
+    <p><strong>Voucher:</strong> <span id="r_voucher"></span></p>
+    <p><strong>Date:</strong> <span id="r_date"></span></p>
+
+    <div style="margin-top:15px; display:flex; gap:10px;">
+      <button class="btn" onclick="downloadReceipt()">⬇ Download</button>
+      <button class="btn" onclick="printReceipt()">🖨 Print</button>
+    </div>
+
+    <button class="btn" style="background:gray;width:100%;margin-top:10px;" onclick="closeReceipt()">Close</button>
+
+  </div>
+</div>
+
+
+
 
 
 </body>
