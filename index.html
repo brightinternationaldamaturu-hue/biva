@@ -483,15 +483,10 @@ nav div {
 
 
 <header>
-
-
   <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:80px;border-radius:40px;">
   <h1>BIVA</h1>
-
-
- <div class="announcement">
-
-    <p>🔔 Welcome to Bright International Virtual Assistance Official Site •  Fast Internet • Reliable and Scured • Instant Wallet Deposite • Receive Voucher Code Instantly When You Buy Data • 24/7 Customer Support • Contact Us Anytime 📞08037807558 • Note: Our data package only work withing some part of damaturu •</p> 
+  <div class="announcement">
+  <p>🔔 Welcome to Bright International Virtual Assistance Official Site •  Fast Internet • Reliable and Scured • Instant Wallet Deposite • Receive Voucher Code Instantly When You Buy Data • 24/7 Customer Support • Contact Us Anytime    📞08037807558 • Note: Our data package only work withing some part of damaturu •</p> 
   </div>
 
 <span id="lastVoucher" style="margin-left:10px;font-weight:600;color:Cyan;"></span>
@@ -502,7 +497,7 @@ nav div {
 
 <div>
   <a href="#voucher">Buy Data</a>
-  <a href="#partnership">Check Data Balance</a>
+  <a href="#partnership">Data Balance</a>
   <a href="#partnership">Partnership</a>
   <a href="#User">Profile</a>
 </div>
@@ -1195,7 +1190,7 @@ function downloadReceipt(){
 
 
 function openBalance(){
-  window.open("https://lookerstudio.google.com/...", "_blank");
+  window.open("https://datastudio.google.com/u/0/reporting/3d71dd76-c386-4a20-99ef-15689299dad7/page/VtLtF");
 }
 
 
@@ -1319,6 +1314,13 @@ window.addEventListener("load", () => {
   const navHeight = nav.offsetHeight;
 
   wallet.style.top = navHeight + "px";
+});
+
+
+
+//Avoid creating New tab when opening a links
+document.querySelectorAll("a").forEach(link => {
+  link.removeAttribute("target");
 });
 
 </script>
