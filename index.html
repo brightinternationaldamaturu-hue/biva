@@ -299,7 +299,7 @@ body {
 }
 
 .wallet-float:active{
-  transform: scale(0.95);
+  transform: scale(1.05);
 }
 
 .wallet-float:hover {
@@ -485,9 +485,8 @@ nav div {
 <header>
 
 
-
-  <h1>(BIVA)</h1>
-<button class="btn" onclick="openBalance()">Check Data Balance</button>
+  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:80px;border-radius:40px;">
+  <h1>BIVA</h1>
 
 
  <div class="announcement">
@@ -502,7 +501,6 @@ nav div {
 <nav>
 
 <div>
-  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:65px;border-radius:40px;">
   <a href="#voucher">Buy Data</a>
   <a href="#partnership">Partnership</a>
   <a href="#User">Profile</a>
@@ -514,7 +512,7 @@ nav div {
 <div class="right-nav">
 
   <span id="wallet" class="wallet-box">₦0</span>
-
+    <button class="btn" onclick="openBalance()">Check Data Balance</button>
     <button class="btn" onclick="fundWallet()">Fund Wallet</button>
     <button class="btn" id="loginBtn" onclick="openModal()">Login</button>
 </div>
