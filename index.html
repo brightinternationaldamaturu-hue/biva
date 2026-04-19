@@ -257,29 +257,30 @@ nav div {
     justify-content: space-between;
   }
 
-  #wallet Balance {
+  #walletBalance {
     font-size: 18px;
   }
 }
 
 
-/* Floating wallet badge */
-.wallet-float{
+.wallet-float {
   position: fixed;
-  top: 80px;
-  right: 15px;
+  top: 70px; /* just below nav */
+  left: 0;
+  width: 100%;
   background: #ff1a1a;
   color: #fff;
-  padding: 10px 16px;
-  border-radius: 25px;
-  font-weight: bold;
-  z-index: 99999;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-  font-size: 16px;
-  min-width: 80px;
+  padding: 10px;
   text-align: center;
+  font-weight: bold;
+  z-index: 10000; /* 🔥 higher than nav */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
 }
 
+
+body {
+  padding-top: 120px;
+}
 
 .wallet-float{
   transition: all 0.3s ease;
@@ -289,6 +290,9 @@ nav div {
   transform: scale(0.95);
 }
 
+.wallet-float:hover {
+  background: #b30000;
+}
 
 
 
@@ -393,24 +397,6 @@ nav div {
   z-index:100000;
 }
     input{width:100%;padding:10px;margin:8px 0;}
-
-
-
-/* 🔥 PASTE IT HERE — LAST THING */
-@media (max-width: 768px) {
-  .wallet-float{
-    top: auto;
-    bottom: 80px; /* move it down */
-    right: 10px;
-    font-size: 14px;
-    padding: 8px 12px;
-  }
-}
-
-
-body {
-  padding-top: 80px;
-}
 
 
 
