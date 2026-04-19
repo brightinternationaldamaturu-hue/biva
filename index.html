@@ -422,21 +422,23 @@ body {
     padding: 0;
   }
 
-  body * {
-    visibility: hidden;
-  }
+  /* 🔥 REMOVE EVERYTHING COMPLETELY */
+  body > *:not(#receiptPrint {
+  white-space: pre-line;
+  line-height: 1.4;
+}
 
-  #receiptPrint, #receiptPrint * {
-    visibility: visible;
-  }
-
+  /* SHOW ONLY RECEIPT */
   #receiptPrint {
+    display: block !important;
     position: absolute;
     top: 0;
     left: 0;
     width: 58mm;
     font-family: monospace;
     font-size: 12px;
+    white-space: pre-line;
+    line-height: 1.4;
   }
 
   @page {
@@ -1220,7 +1222,7 @@ function openBalance(){
 
 
 
-<div id="receiptPrint" style="display:none; position:absolute; width:220px;">
+<div id="receiptPrint" style="display:none;">
 
   <h3 style="text-align:center;">BIVA RECEIPT</h3>
   <hr>
