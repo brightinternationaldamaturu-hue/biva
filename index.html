@@ -418,27 +418,20 @@ body {
 @media print {
 
   body * {
-    visibility: hidden;
-  }
-
-  #receiptPrint, #receiptPrint * {
-    visibility: visible;
+    display: none !important;
   }
 
   #receiptPrint {
+    display: block !important;
     position: absolute;
     top: 0;
     left: 0;
-    width: 220px; /* 58mm receipt width */
+    width: 58mm;
     font-family: monospace;
     font-size: 12px;
   }
 
-  @page {
-    size: 58mm auto;
-    margin: 0;
-  }
-
+}
 }
 
 
@@ -1111,25 +1104,20 @@ function closeReceipt(){
 
 function printReceipt(){
 
-  // Fill print data
   document.getElementById("p_email").innerText = document.getElementById("r_email").innerText;
   document.getElementById("p_plan").innerText = document.getElementById("r_plan").innerText;
   document.getElementById("p_price").innerText = document.getElementById("r_price").innerText;
   document.getElementById("p_voucher").innerText = document.getElementById("r_voucher").innerText;
   document.getElementById("p_date").innerText = document.getElementById("r_date").innerText;
 
-  // Show print area
-  document.getElementById("receiptPrint").style.display = "block";
+  const receipt = document.getElementById("receiptPrint");
 
-  // Print
-  window.print();
+  receipt.style.display = "block";
+      receipt.style.display = "none";
+    }, 500);
 
-  // Hide again after print
-  setTimeout(() => {
-    document.getElementById("receiptPrint").style.display = "none";
-  }, 1000);
+  }, 100);
 }
-
 
 
 
@@ -1228,8 +1216,12 @@ function openBalance(){
 
 
 
-<div id="receiptPrint" style="visibility:hidden; position:absolute;">
-  <h3 style="text-align:center;">BIVA RECEIPT</h3>
+<div id="receiptPrint" style="
+  	display:none;
+  	position:absolute;
+  	width:220px;
+  	page-break-after: avoid;
+ 	<h3 style="text-align:center;">BIVA RECEIPT</h3>
   <hr>
 
   <p>Email: <span id="p_email"></span></p>
