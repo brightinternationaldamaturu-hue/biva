@@ -265,15 +265,28 @@ nav div {
 
 .wallet-float {
   position: fixed;
-  top: 110px; /* increase this */
-  left: 0;
-  width: 100%;
+  top: 100px; /* adjust if needed */
+  right: 15px; /* move to right */
+  
   background: #ff1a1a;
   color: #fff;
-  padding: 10px;
-  text-align: center;
+
+  padding: 8px 14px; /* auto size */
+  border-radius: 30px; /* pill shape */
+
   font-weight: bold;
-  z-index: 9999; /* BELOW nav */
+  font-size: 14px;
+
+  display: inline-block;
+  width: auto; /* 🔥 IMPORTANT */
+  max-width: 90px; /* prevent too long stretch */
+
+  text-align: center;
+
+  z-index: 9998;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+
+  transition: all 0.3s ease;
 }
 
 
