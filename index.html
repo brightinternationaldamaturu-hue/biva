@@ -417,12 +417,20 @@ body {
 
 @media print {
 
+  body {
+    margin: 0;
+    padding: 0;
+  }
+
   body * {
-    display: none !important;
+    visibility: hidden;
+  }
+
+  #receiptPrint, #receiptPrint * {
+    visibility: visible;
   }
 
   #receiptPrint {
-    display: block !important;
     position: absolute;
     top: 0;
     left: 0;
@@ -431,10 +439,11 @@ body {
     font-size: 12px;
   }
 
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
 }
-}
-
-
 
 
 
@@ -1101,7 +1110,6 @@ function closeReceipt(){
 
 
 
-
 function printReceipt(){
 
   document.getElementById("p_email").innerText = document.getElementById("r_email").innerText;
@@ -1111,12 +1119,13 @@ function printReceipt(){
   document.getElementById("p_date").innerText = document.getElementById("r_date").innerText;
 
   const receipt = document.getElementById("receiptPrint");
-
   receipt.style.display = "block";
-      receipt.style.display = "none";
-    }, 500);
 
-  }, 100);
+  // 🔥 give browser time to render
+  setTimeout(() => {
+    window.print();
+    receipt.style.display = "none";
+  }, 500);
 }
 
 
@@ -1210,18 +1219,10 @@ function openBalance(){
 
 
 
-</div>
 
+<div id="receiptPrint" style="display:none; position:absolute; width:220px;">
 
-
-
-
-<div id="receiptPrint" style="
-  	display:none;
-  	position:absolute;
-  	width:220px;
-  	page-break-after: avoid;
- 	<h3 style="text-align:center;">BIVA RECEIPT</h3>
+  <h3 style="text-align:center;">BIVA RECEIPT</h3>
   <hr>
 
   <p>Email: <span id="p_email"></span></p>
@@ -1232,6 +1233,7 @@ function openBalance(){
 
   <hr>
   <p style="text-align:center;">Thank you</p>
+
 </div>
 
 
