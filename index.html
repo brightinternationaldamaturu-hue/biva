@@ -265,7 +265,7 @@ nav div {
 
 .wallet-float {
   position: fixed;
-  top: 70px; /* just below nav */
+  top: 110px; /* increase this */
   left: 0;
   width: 100%;
   background: #ff1a1a;
@@ -273,13 +273,12 @@ nav div {
   padding: 10px;
   text-align: center;
   font-weight: bold;
-  z-index: 10000; /* 🔥 higher than nav */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  z-index: 9999; /* BELOW nav */
 }
 
 
 body {
-  padding-top: 120px;
+  padding-top: 160px;
 }
 
 .wallet-float{
@@ -1298,6 +1297,15 @@ async function sendSupportMessage(text){
 }
 
 
+
+window.addEventListener("load", () => {
+  const nav = document.querySelector("nav");
+  const wallet = document.querySelector(".wallet-float");
+
+  const navHeight = nav.offsetHeight;
+
+  wallet.style.top = navHeight + "px";
+});
 
 </script>
 
