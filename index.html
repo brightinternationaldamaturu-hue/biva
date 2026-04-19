@@ -413,6 +413,8 @@ body {
 }
 
 
+
+
 @media print {
 
   body * {
@@ -423,10 +425,14 @@ body {
     visibility: visible;
   }
 
-
-#receiptPrint {
-  display: block !important;
-}
+  #receiptPrint {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 220px; /* 58mm receipt width */
+    font-family: monospace;
+    font-size: 12px;
+  }
 
   @page {
     size: 58mm auto;
@@ -1152,17 +1158,6 @@ function downloadReceipt(){
 function openBalance(){
   window.open("https://lookerstudio.google.com/...", "_blank");
 }
-
-
-
-document.getElementById("receiptPrint").style.visibility = "visible";
-document.getElementById("receiptPrint").style.visibility = "hidden";
-
-
-setTimeout(() => {
-  window.print();
-}, 200);
-
 
 
 
