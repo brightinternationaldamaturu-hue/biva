@@ -1202,6 +1202,117 @@ function openBalance(){
 
 
 
+
+
+
+
+function openChatBox(){
+  document.getElementById("chatBox").style.display = "block";
+  loadMessages();
+}
+
+function closeChatBox(){
+  document.getElementById("chatBox").style.display = "none";
+}
+
+
+
+
+
+
+
+async function sendMessage(){
+  const input = document.getElementById("chatInput");
+  const text = input.value.trim();
+
+  if(!text || !currentUser){
+    showAlert("Login first to chat", "warning");
+    return;
+  }
+
+  const ref = db.collection("supportChats").doc(currentUser.uid);
+
+  await ref.set({
+    email: currentUser.email,
+    updatedAt: new Date(),
+    lastMessage: text,
+    unreadAdmin: true
+  }, { merge: true });
+
+  await ref.collection("messages").add({
+    text: text,
+    sender: "user",
+    createdAt: new Date()
+  });
+
+  input.value = "";
+}
+
+
+
+
+
+function loadMessages(){
+  const box = document.getElementById("chatMessages");
+
+db.collection("supportChats")
+  .doc(currentUser.uid)
+  .collection("messages")
+  .orderBy("createdAt")
+  .onSnapshot(snapshot => {
+
+      box.innerHTML = "";
+
+      snapshot.forEach(doc => {
+        const m = doc.data();
+
+        box.innerHTML += `
+          <div style="
+            text-align:${m.sender === 'user' ? 'right' : 'left'};
+            margin:5px 0;
+          ">
+            <span style="
+              display:inline-block;
+              padding:8px;
+              border-radius:10px;
+              background:${m.sender === 'user' ? '#ff1a1a' : '#eee'};
+              color:${m.sender === 'user' ? '#fff' : '#000'};
+              max-width:80%;
+            ">
+              ${m.text}
+            </span>
+          </div>
+        `;
+      });
+
+      box.scrollTop = box.scrollHeight;
+    });
+}
+
+
+
+
+async function sendSupportMessage(text){
+
+  const ref = db.collection("supportChats").doc(currentUser.uid);
+
+  await ref.set({
+    email: currentUser.email,
+    updatedAt: new Date(),
+    lastMessage: text,
+    unreadAdmin: true
+  }, { merge:true });
+
+  await ref.collection("messages").add({
+    text: text,
+    sender: "user",
+    createdAt: new Date()
+  });
+
+}
+
+
+
 </script>
 
 
@@ -1281,6 +1392,55 @@ function openBalance(){
 
 
 
+<div id="chatSupportBtn" onclick="openChatBox()" style="
+  position:fixed;
+  bottom:90px;
+  right:20px;
+  background:#8B0000;
+  color:white;
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  cursor:pointer;
+  z-index:99999;
+">
+💬
+</div>
+
+
+
+
+<div id="chatBox" style="
+  display:none;
+  position:fixed;
+  bottom:150px;
+  right:20px;
+  width:300px;
+  height:400px;
+  background:#fff;
+  border-radius:10px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.3);
+  z-index:99999;
+  overflow:hidden;
+">
+
+  <div style="background:#8B0000;color:#fff;padding:10px;">
+    Live Support
+    <span onclick="closeChatBox()" style="float:right;cursor:pointer;">❌</span>
+  </div>
+
+  <div id="chatMessages" style="height:300px;overflow:auto;padding:10px;font-size:14px;"></div>
+
+  <div style="display:flex;">
+    <input id="chatInput" placeholder="Type message..." style="flex:1;padding:10px;border:none;">
+    <button onclick="sendMessage()" style="background:#8B0000;color:#fff;border:none;padding:10px;">Send</button>
+  </div>
+
+</div>
 
 
 
