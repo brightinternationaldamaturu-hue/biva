@@ -413,6 +413,35 @@ body {
 }
 
 
+@media print {
+
+  body * {
+    visibility: hidden;
+  }
+
+  #receiptPrint, #receiptPrint * {
+    visibility: visible;
+  }
+
+
+#receiptPrint {
+  display: block !important;
+}
+
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
+
+}
+
+
+
+
+
+
+
+
   </style>
 </head>
 <body>
@@ -1075,50 +1104,24 @@ function closeReceipt(){
 
 
 function printReceipt(){
-  const receiptHTML = `
-    <div style="width:58mm;font-family:monospace;font-size:12px;">
-      <h3 style="text-align:center;margin:5px 0;">BIVA RECEIPT</h3>
-      <hr>
 
-      <p>Email: ${document.getElementById("r_email").innerText}</p>
-      <p>Plan: ${document.getElementById("r_plan").innerText}</p>
-      <p>Amount: ₦${document.getElementById("r_price").innerText}</p>
-      <p>Voucher: ${document.getElementById("r_voucher").innerText}</p>
-      <p>Date: ${document.getElementById("r_date").innerText}</p>
+  // Fill print data
+  document.getElementById("p_email").innerText = document.getElementById("r_email").innerText;
+  document.getElementById("p_plan").innerText = document.getElementById("r_plan").innerText;
+  document.getElementById("p_price").innerText = document.getElementById("r_price").innerText;
+  document.getElementById("p_voucher").innerText = document.getElementById("r_voucher").innerText;
+  document.getElementById("p_date").innerText = document.getElementById("r_date").innerText;
 
-      <hr>
-      <p style="text-align:center;">Thank you for connecting with BIVA</p>
-    </div>
-  `;
+  // Show print area
+  document.getElementById("receiptPrint").style.display = "block";
 
-  const printWindow = window.open('', '', 'width=300,height=600');
+  // Print
+  window.print();
 
-  printWindow.document.write(`
-    <html>
-      <head>
-        <title>Receipt</title>
-        <style>
-          @page { size: 58mm auto; margin: 0; }
-          body {
-            width: 58mm;
-            margin: 0;
-            padding: 10px;
-            font-family: monospace;
-          }
-          hr {
-            border: none;
-            border-top: 1px dashed #000;
-          }
-        </style>
-      </head>
-
-      <body onload="window.print(); window.close();">
-        ${receiptHTML}
-      </body>
-    </html>
-  `);
-
-  printWindow.document.close();
+  // Hide again after print
+  setTimeout(() => {
+    document.getElementById("receiptPrint").style.display = "none";
+  }, 1000);
 }
 
 
@@ -1150,6 +1153,15 @@ function openBalance(){
   window.open("https://lookerstudio.google.com/...", "_blank");
 }
 
+
+
+document.getElementById("receiptPrint").style.visibility = "visible";
+document.getElementById("receiptPrint").style.visibility = "hidden";
+
+
+setTimeout(() => {
+  window.print();
+}, 200);
 
 
 
@@ -1216,6 +1228,26 @@ function openBalance(){
 
 
 </div>
+
+
+
+
+
+<div id="receiptPrint" style="visibility:hidden; position:absolute;">
+  <h3 style="text-align:center;">BIVA RECEIPT</h3>
+  <hr>
+
+  <p>Email: <span id="p_email"></span></p>
+  <p>Plan: <span id="p_plan"></span></p>
+  <p>Amount: ₦<span id="p_price"></span></p>
+  <p>Voucher: <span id="p_voucher"></span></p>
+  <p>Date: <span id="p_date"></span></p>
+
+  <hr>
+  <p style="text-align:center;">Thank you</p>
+</div>
+
+
 
 
 
