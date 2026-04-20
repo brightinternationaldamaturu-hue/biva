@@ -415,21 +415,35 @@ nav div {
 
 @media print {
 
-  body {
-    margin: 0;
-    padding: 0;
+  /* Hide EVERYTHING first */
+  body * {
+    visibility: hidden !important;
   }
 
-  /* 🔥 SHOW ONLY RECEIPT */
+  /* Show only receipt */
+  #receiptPrint, #receiptPrint * {
+    visibility: visible !important;
+  }
+
   #receiptPrint {
-    display: block !important;
     position: absolute;
-    top: 0;
     left: 0;
+    top: 0;
     width: 58mm;
+    padding: 10px;
     font-family: monospace;
-    font-size: 14px;
-    line-height: 1.8;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* Remove fixed UI from print flow */
+  nav,
+  .wallet-float,
+  #chatBox,
+  #chatSupportBtn,
+  header,
+  footer {
+    display: none !important;
   }
 
   @page {
@@ -437,7 +451,6 @@ nav div {
     margin: 0;
   }
 }
-
 
 
 #transactionTable {
@@ -1160,11 +1173,14 @@ function printReceipt(){
   const receipt = document.getElementById("receiptPrint");
   receipt.style.display = "block";
 
-  // 🔥 give browser time to render
   setTimeout(() => {
     window.print();
-    receipt.style.display = "none";
-  }, 500);
+
+    setTimeout(() => {
+      receipt.style.display = "none";
+    }, 1000);
+
+  }, 300);
 }
 
 
