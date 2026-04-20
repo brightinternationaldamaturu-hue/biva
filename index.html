@@ -724,7 +724,7 @@ function fundWallet(){
     return;
   }
 
-  let amount = prompt("Enter amount to fund (₦):");
+  let amount = parseFloat(prompt("Enter amount to fund (₦):"));
 
   if(!amount || amount <= 0){
     showAlert("Invalid amount");
@@ -732,7 +732,7 @@ function fundWallet(){
   }
 
   FlutterwaveCheckout({
-    public_key: "FLWPUBK-36d9a62ddae2728dbd0beebf3c3cb99b-X",
+    public_key: "FLWPUBK-36d9a62ddae2728dbd0beebf3c3cb99b-X", // use correct key
     tx_ref: "BIVA_" + Date.now(),
     amount: amount,
     currency: "NGN",
@@ -743,50 +743,51 @@ function fundWallet(){
 
     callback: async function (response) {
 
-      if(response.status === "completed"){  // ✅ FIXED
+      console.log(response);
 
+      if (response.status !== "completed" || !response.transaction_id) {
+        showAlert("Payment not successful", "error");
+        return;
+      }
+
+      try {
         const txRef = response.tx_ref;
-        const paymentRef = db.collection("payments").doc(txRef);
 
+        const paymentRef = db.collection("payments").doc(txRef);
         const paymentDoc = await paymentRef.get();
 
-        // 🔒 Prevent double credit
-        if(paymentDoc.exists && paymentDoc.data().status === "completed"){
+        if (paymentDoc.exists) {
           showAlert("⚠️ Payment already processed");
           return;
         }
 
-        // Save payment
         await paymentRef.set({
           userId: currentUser.uid,
-          amount: parseFloat(amount),
+          amount: parseFloat(response.amount),
           status: "completed",
+          transactionId: response.transaction_id,
           createdAt: new Date()
         });
 
-        // Credit wallet ONCE
         const userRef = db.collection("users").doc(currentUser.uid);
-        const userDoc = await userRef.get();
-
-        let bal = userDoc.data().wallet || 0;
 
         await userRef.update({
-          wallet: bal + parseFloat(amount)
+          wallet: firebase.firestore.FieldValue.increment(parseFloat(response.amount))
         });
-        
 
-await db.collection("transactions").add({
-  userId: currentUser.uid,
-  email: currentUser.email,
-  amount: parseFloat(amount),
-  type: "fund",
-  createdAt: new Date()
-});
+        await db.collection("transactions").add({
+          userId: currentUser.uid,
+          email: currentUser.email,
+          amount: parseFloat(response.amount),
+          type: "fund",
+          createdAt: new Date()
+        });
 
         showAlert("✅ Wallet funded successfully!");
 
-      } else {
-        showAlert("Payment failed");
+      } catch (err) {
+        showAlert("❌ Error funding wallet", "error");
+        console.error(err);
       }
     },
 
@@ -794,8 +795,9 @@ await db.collection("transactions").add({
       console.log("Payment closed");
     }
 
-  }); // ✅ VERY IMPORTANT (closing bracket)
+  });
 }
+
 
 
 
