@@ -415,12 +415,23 @@ nav div {
 
 @media print {
 
-  body * {
-    visibility: hidden;
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: auto !important;
+    overflow: hidden !important;
   }
 
-  #receiptPrint, #receiptPrint * {
-    visibility: visible;
+  /* hide everything */
+  body * {
+    display: none !important;
+  }
+
+  /* only show receipt */
+  #receiptPrint,
+  #receiptPrint * {
+    display: block !important;
+    visibility: visible !important;
   }
 
   #receiptPrint {
@@ -431,7 +442,7 @@ nav div {
     padding: 10px;
     font-family: monospace;
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1.4;
   }
 
   @page {
@@ -1413,7 +1424,7 @@ document.querySelectorAll("a").forEach(link => {
 
 
 
-<div id="receiptPrint" style="display:none;">
+<div id="receiptPrint">
 
   <h3 style="text-align:center;">BIVA RECEIPT</h3>
   <hr>
