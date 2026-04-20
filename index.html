@@ -415,14 +415,12 @@ nav div {
 
 @media print {
 
-  /* Hide EVERYTHING first */
   body * {
-    visibility: hidden !important;
+    visibility: hidden;
   }
 
-  /* Show only receipt */
   #receiptPrint, #receiptPrint * {
-    visibility: visible !important;
+    visibility: visible;
   }
 
   #receiptPrint {
@@ -434,16 +432,6 @@ nav div {
     font-family: monospace;
     font-size: 12px;
     line-height: 1.5;
-  }
-
-  /* Remove fixed UI from print flow */
-  nav,
-  .wallet-float,
-  #chatBox,
-  #chatSupportBtn,
-  header,
-  footer {
-    display: none !important;
   }
 
   @page {
@@ -483,6 +471,16 @@ nav div {
     font-size: 12px;
   }
 }
+
+
+
+
+html, body {
+  height: auto !important;
+  overflow: visible !important;
+}
+
+
 
 
   </style>
@@ -655,7 +653,13 @@ nav div {
 
 <script>
 
-const walletFloat = document.getElementById('walletFloat');
+let walletFloat = null;
+
+window.addEventListener("DOMContentLoaded", () => {
+  walletFloat = document.getElementById('walletFloat');
+});
+
+if (walletFloat) walletFloat.innerText = '₦' + balance;
 
 
 function showAlert(message, type="success"){
@@ -927,7 +931,7 @@ if (doc.exists && doc.data().blocked === true) {
     logoutBtn.style.display = 'none';
 
     document.getElementById("userEmail").innerText = "";
-    document.getElementById("transactionList").innerHTML = "";
+    document.getElementById("transactionBody").innerHTML = "";
   }
 });
 
@@ -1164,25 +1168,29 @@ function closeReceipt(){
 
 function printReceipt(){
 
+  const receipt = document.getElementById("receiptPrint");
+
+  // fill values
   document.getElementById("p_email").innerText = document.getElementById("r_email").innerText;
   document.getElementById("p_plan").innerText = document.getElementById("r_plan").innerText;
   document.getElementById("p_price").innerText = document.getElementById("r_price").innerText;
   document.getElementById("p_voucher").innerText = document.getElementById("r_voucher").innerText;
   document.getElementById("p_date").innerText = document.getElementById("r_date").innerText;
 
-  const receipt = document.getElementById("receiptPrint");
+  // FORCE visible BEFORE print
   receipt.style.display = "block";
 
+  // wait for DOM paint
   setTimeout(() => {
     window.print();
 
+    // hide again after print
     setTimeout(() => {
       receipt.style.display = "none";
-    }, 1000);
+    }, 500);
 
   }, 300);
 }
-
 
 
 
@@ -1340,6 +1348,9 @@ window.addEventListener("load", () => {
 document.querySelectorAll("a").forEach(link => {
   link.removeAttribute("target");
 });
+
+
+
 
 </script>
 
