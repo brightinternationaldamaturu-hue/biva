@@ -19,6 +19,34 @@
   <style>
 
 
+.download-btn {
+  background: #25D366; /* green to stand out */
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 12px;
+  text-decoration: none;
+  display: inline-block;
+  transition: 0.3s;
+}
+
+.download-btn:hover {
+  background: #1ea952;
+  transform: scale(1.05);
+}
+
+
+
+
+@media (max-width: 768px) {
+  .download-btn {
+    width: 100%;
+    text-align: center;
+    margin-top: 5px;
+  }
+}
+
+
 
 
 
@@ -537,7 +565,9 @@ html, body {
 <div class="right-nav">
 
   <span id="wallet" class="wallet-box">₦0</span>
-    
+    <a href="https://drive.google.com/file/d/1PHIztpcfOcApfy7hIpNuvc7YqAUYrqni/view?usp=drive_link" target="_blank" class="btn download-btn">
+  ⬇ Download App
+</a>
     <button class="btn" onclick="fundWallet()">Fund Wallet</button>
     <button class="btn" id="loginBtn" onclick="openModal()">Login</button>
 </div>
