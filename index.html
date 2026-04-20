@@ -413,6 +413,13 @@ nav div {
 
 
 
+
+#receiptPrint {
+  display: none;
+}
+
+
+
 @media print {
 
   html, body {
@@ -442,7 +449,7 @@ nav div {
     padding: 10px;
     font-family: monospace;
     font-size: 12px;
-    line-height: 1.4;
+    line-height: 1.0;
   }
 
   @page {
@@ -559,6 +566,9 @@ html, body {
     <button class="btn" onclick="closeModal()" style="background:gray">Close</button>
 </div>
 </div>
+
+
+
 
 
 <section id="about">
@@ -1362,8 +1372,9 @@ document.querySelectorAll("a").forEach(link => {
 
 
 
-
 </script>
+
+
 
 
 <div id="confirmBox" class="modal" style="display:none;">
@@ -1424,24 +1435,6 @@ document.querySelectorAll("a").forEach(link => {
 
 
 
-<div id="receiptPrint">
-
-  <h3 style="text-align:center;">BIVA RECEIPT</h3>
-  <hr>
-
-  <p>Email: <span id="p_email"></span></p>
-  <p>Plan: <span id="p_plan"></span></p>
-  <p>Amount: ₦<span id="p_price"></span></p>
-  <p>Voucher: <span id="p_voucher"></span></p>
-  <p>Date: <span id="p_date"></span></p>
-
-  <hr>
-  <p style="text-align:center;">Thank you</p>
-
-</div>
-
-
-
 <div id="chatSupportBtn" onclick="openChatBox()" style="
   position:fixed;
   bottom:90px;
@@ -1493,6 +1486,27 @@ document.querySelectorAll("a").forEach(link => {
 </div>
 
 
+
+
+
+
+
+
+<div id="receiptPrint">
+
+  <h3 style="text-align:center;">BIVA RECEIPT</h3>
+  <hr>
+
+  <p>Email: <span id="p_email"></span></p>
+  <p>Plan: <span id="p_plan"></span></p>
+  <p>Amount: ₦<span id="p_price"></span></p>
+  <p>Voucher: <span id="p_voucher"></span></p>
+  <p>Date: <span id="p_date"></span></p>
+
+  <hr>
+  <p style="text-align:center;">Thank you</p>
+
+</div>
 
 </body>
 </html>
