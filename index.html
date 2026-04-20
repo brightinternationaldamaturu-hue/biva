@@ -872,7 +872,6 @@ async function login(){
       });
     }
 
-    showAlert(" ");
     closeModal();
 
   }catch(err){
@@ -886,7 +885,6 @@ async function login(){
 function logout(){
   auth.signOut()
     .then(() => {
-      showAlert(" ");
     })
     .catch(err => {
       showAlert("Error: " + err.message);
