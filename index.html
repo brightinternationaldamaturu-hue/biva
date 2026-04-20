@@ -834,7 +834,7 @@ async function login(){
       });
     }
 
-    showAlert("✅ Login successful");
+    showAlert(" ");
     closeModal();
 
   }catch(err){
@@ -848,7 +848,7 @@ async function login(){
 function logout(){
   auth.signOut()
     .then(() => {
-      showAlert("Logged out successfully");
+      showAlert(" ");
     })
     .catch(err => {
       showAlert("Error: " + err.message);
