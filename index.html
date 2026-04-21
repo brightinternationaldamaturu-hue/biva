@@ -667,13 +667,34 @@ html, body {
 </section>
 
 
+
+
 <section id="partnership">
   <h2>Partnership Program</h2>
   <div class="card" style="text-align:left;padding:20px;">
     <p>Join the BIVA Partnership Program and earn income by reselling internet vouchers.</p>
     <a class="btn" href="https://form.jotform.com/260963343803054" target="_blank">Apply for Partnership</a>
     <button class="btn" onclick="openBalance()">Check Data Balance</button>
+
+
+
+
+<button class="btn" onclick="openInvoice()">Submit Invoice</button>
+
+<div id="confirmBox" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Confirm Purchase</h3>
+
+    <p id="confirmText"></p>
+
+    <button class="btn" id="confirmYes">Yes, Buy</button>
+    <button class="btn" onclick="closeConfirm()" style="background:gray">Cancel</button>
   </div>
+</div>
+
+  </div>
+
+
 
 </section>
 
@@ -686,6 +707,10 @@ html, body {
     <span id="userEmail" style="margin-right:10px;font-weight:600;color:Red;"></span>
     <button class="btn" id="logoutBtn" onclick="logout()" style="display:none">Logout</button>
 </section>
+
+
+
+
 
 
 <footer>
@@ -1400,21 +1425,48 @@ document.querySelectorAll("a").forEach(link => {
 
 
 
+
+
+
+
+
+
+function openInvoice(){
+  const url = "https://brightinternationaldamaturu-hue.github.io/staffs/"; // 👈 replace with your link
+  document.getElementById("invoiceFrame").src = url;
+  document.getElementById("invoiceModal").style.display = "flex";
+}
+
+function closeInvoice(){
+  document.getElementById("invoiceModal").style.display = "none";
+  document.getElementById("invoiceFrame").src = "";
+}
+
 </script>
 
 
 
 
-<div id="confirmBox" class="modal" style="display:none;">
-  <div class="modal-content">
-    <h3>Confirm Purchase</h3>
 
-    <p id="confirmText"></p>
 
-    <button class="btn" id="confirmYes">Yes, Buy</button>
-    <button class="btn" onclick="closeConfirm()" style="background:gray">Cancel</button>
+
+<div id="invoiceModal" class="modal" style="display:none;">
+  <div class="modal-content" style="width:90%;height:90%;padding:0;overflow:hidden;">
+
+    <div style="background:#8B0000;color:#fff;padding:10px;display:flex;justify-content:space-between;">
+      <span>Submit Invoice</span>
+      <span style="cursor:pointer;" onclick="closeInvoice()">❌</span>
+    </div>
+
+    <iframe 
+      id="invoiceFrame"
+      src=""
+      style="width:100%;height:100%;border:none;">
+    </iframe>
+
   </div>
 </div>
+
 
 
 
@@ -1458,6 +1510,8 @@ document.querySelectorAll("a").forEach(link => {
 
   </div>
 </div>
+
+
 
 
 
@@ -1512,6 +1566,11 @@ document.querySelectorAll("a").forEach(link => {
   </div>
 
 </div>
+
+
+
+
+
 
 
 
