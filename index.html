@@ -1001,89 +1001,121 @@ plansDiv.innerHTML += `
 });
 
 // BUY WITH WALLET
-async function buy(price, plan){
-  if(!currentUser){
-    showAlert('Login first');
+async function buy(price, plan) {
+  if (!currentUser) {
+    showAlert("Login first");
     return;
   }
 
-  const ref = db.collection('users').doc(currentUser.uid);
+  const userId = currentUser.uid;
+  const userRef = db.collection("users").doc(userId);
+  const lockRef = db.collection("purchaseLocks").doc(userId);
+
+  const txId = "TX_" + userId + "_" + Date.now();
 
   try {
-    const doc = await ref.get();
+    // 🔒 STEP 1: Acquire lock (prevents double click / parallel execution)
+    const lockSnap = await lockRef.get();
 
-    if(!doc.exists){
-      showAlert('User wallet not found');
+    if (lockSnap.exists && lockSnap.data().locked) {
+      showAlert("⏳ Please wait, transaction already in progress", "warning");
       return;
     }
 
-    let bal = doc.data().wallet || 0;
-
-    if(bal < price){
-      showAlert('Insufficient balance');
-      return;
-    }
-
-    // 🔥 STEP 1: CALL WEBHOOK FIRST
-    const res = await fetch("https://hook.us2.make.com/pm61x9gphx81e59lrvy1q7tmnfsd7ggo", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        plan: plan,
-        price: price,
-        email: currentUser.email
-      })
-    });
-
-    // ❌ If webhook fails
-    if(!res.ok){
-      throw new Error("Server error. Try again.");
-    }
-
-    const data = await res.json().catch(() => ({}));
-
-    const voucher = data.voucher;
-
-    // ❌ If NO voucher returned
-    if(!voucher){
-      throw new Error("Voucher not received. Try again.");
-    }
-
-    // ✅ STEP 2: NOW deduct wallet
-    await ref.update({
-      wallet: bal - price
-    });
-
-    // ✅ STEP 3: Save voucher
-    await db.collection("users").doc(currentUser.uid).update({
-      lastVoucher: voucher
-    });
-
-    // ✅ STEP 4: Save transaction
-    await db.collection("transactions").add({
-      userId: currentUser.uid,
-      email: currentUser.email,
-      plan: plan,
-      price: price,
-      voucher: voucher,
-      type: "purchase",
+    await lockRef.set({
+      locked: true,
+      txId: txId,
       createdAt: new Date()
     });
 
+    // 🔄 STEP 2: Run atomic wallet transaction
+    const voucherData = await db.runTransaction(async (transaction) => {
+
+      const userDoc = await transaction.get(userRef);
+
+      if (!userDoc.exists) {
+        throw new Error("User wallet not found");
+      }
+
+      const wallet = userDoc.data().wallet || 0;
+
+      if (wallet < price) {
+        throw new Error("Insufficient balance");
+      }
+
+      // Deduct wallet atomically
+      transaction.update(userRef, {
+        wallet: wallet - price
+      });
+
+      return { walletAfter: wallet - price };
+    });
+
+    // 🌐 STEP 3: Call webhook ONLY ONCE (after successful deduction)
+    const res = await fetch("https://hook.us2.make.com/pm61x9gphx81e59lrvy1q7tmnfsd7ggo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plan,
+        price,
+        email: currentUser.email,
+        txId: txId
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error("Voucher server error");
+    }
+
+    const data = await res.json();
+    const voucher = data.voucher;
+
+    if (!voucher) {
+      throw new Error("Voucher not received");
+    }
+
+    // 🧾 STEP 4: Idempotency check (prevents duplicate voucher writing)
+    const txRef = db.collection("transactions").doc(txId);
+    const txSnap = await txRef.get();
+
+    if (txSnap.exists) {
+      throw new Error("Duplicate transaction blocked");
+    }
+
+    // 💾 STEP 5: Save transaction safely
+    await txRef.set({
+      userId,
+      email: currentUser.email,
+      plan,
+      price,
+      voucher,
+      type: "purchase",
+      txId,
+      createdAt: new Date()
+    });
+
+    // 🧠 STEP 6: Update last voucher
+    await userRef.update({
+      lastVoucher: voucher
+    });
+
+    // 🎉 SUCCESS
     showAlert("✅ Purchase successful!");
 
-// 🔥 Trigger print
-printVoucher({
-  email: currentUser.email,
-  plan: plan,
-  price: price,
-  voucher: voucher
-});
+    printVoucher({
+      email: currentUser.email,
+      plan,
+      price,
+      voucher
+    });
 
-  } catch(err){
+  } catch (err) {
     showAlert("❌ " + err.message, "error");
+    console.error(err);
+
+  } finally {
+    // 🔓 STEP 7: ALWAYS release lock (critical)
+    await lockRef.set({ locked: false });
   }
 }
 
