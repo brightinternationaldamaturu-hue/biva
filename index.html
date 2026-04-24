@@ -784,6 +784,21 @@ async function signup(){
 }
 
 
+    // ✅Bonus Calculator
+function calculateBonus(amount){
+  let bonus = 0;
+
+  if(amount >= 10000){
+    bonus = amount * 0.15;
+  } else if(amount >= 5000){
+    bonus = amount * 0.10;
+  } else if(amount >= 1000){
+    bonus = amount * 0.05;
+  }
+
+  return bonus;
+}
+
 
 
 function fundWallet(){
@@ -809,55 +824,72 @@ function fundWallet(){
       email: currentUser.email,
     },
 
-    callback: async function (response) {
 
-      console.log(response);
 
-      if (response.status !== "completed" || !response.transaction_id) {
-        showAlert("Payment not successful", "error");
-        return;
-      }
 
-      try {
-        const txRef = response.tx_ref;
 
-        const paymentRef = db.collection("payments").doc(txRef);
-        const paymentDoc = await paymentRef.get();
 
-        if (paymentDoc.exists) {
-          showAlert("⚠️ Payment already processed");
-          return;
-        }
+callback: async function (response) {
 
-        await paymentRef.set({
-          userId: currentUser.uid,
-          amount: parseFloat(response.amount),
-          status: "completed",
-          transactionId: response.transaction_id,
-          createdAt: new Date()
-        });
+  console.log(response);
 
-        const userRef = db.collection("users").doc(currentUser.uid);
+  if (response.status !== "completed") {
+    showAlert("Payment not successful", "error");
+    return;
+  }
 
-        await userRef.update({
-          wallet: firebase.firestore.FieldValue.increment(parseFloat(response.amount))
-        });
+  try {
+    const txRef = response.tx_ref;
 
-        await db.collection("transactions").add({
-          userId: currentUser.uid,
-          email: currentUser.email,
-          amount: parseFloat(response.amount),
-          type: "fund",
-          createdAt: new Date()
-        });
+    const paymentRef = db.collection("payments").doc(txRef);
+    const paymentDoc = await paymentRef.get();
 
-        showAlert("✅ Wallet funded successfully!");
+    if (paymentDoc.exists) {
+      showAlert("⚠️ Payment already processed");
+      return;
+    }
 
-      } catch (err) {
-        showAlert("❌ Error funding wallet", "error");
-        console.error(err);
-      }
-    },
+    // ✅ Calculate FIRST
+    const amount = parseFloat(response.amount);
+    const bonus = calculateBonus(amount);
+    const total = amount + bonus;
+
+    const userRef = db.collection("users").doc(currentUser.uid);
+
+    // ✅ Update wallet FIRST
+    await userRef.update({
+      wallet: firebase.firestore.FieldValue.increment(total)
+    });
+
+    // ✅ Save payment record
+    await paymentRef.set({
+      userId: currentUser.uid,
+      amount,
+      bonus,
+      totalCredited: total,
+      status: "completed",
+      transactionId: response.transaction_id,
+      createdAt: new Date()
+    });
+
+    // ✅ Save transaction ONCE
+    await db.collection("transactions").add({
+      userId: currentUser.uid,
+      email: currentUser.email,
+      amount,
+      bonus,
+      total,
+      type: "fund",
+      createdAt: new Date()
+    });
+
+    showAlert(`✅ Funded ₦${amount} + ₦${bonus} bonus = ₦${total}`);
+
+  } catch (err) {
+    showAlert("❌ Error funding wallet", "error");
+    console.error(err);
+  }
+},
 
     onclose: function(){
       console.log("Payment closed");
@@ -1128,7 +1160,6 @@ function loadTransactions(uid){
 
   db.collection("transactions")
     .where("userId", "==", uid)
-    .where("type", "==", "purchase")
     .onSnapshot(snapshot => {
 
       body.innerHTML = "";
@@ -1149,16 +1180,39 @@ function loadTransactions(uid){
           ? t.createdAt.toDate().toLocaleString()
           : "Just now";
 
+        // 🔥 Decide label + color
+        let typeLabel = "UNKNOWN";
+        let color = "#333";
+
+        if(t.type === "fund"){
+          typeLabel = "FUND";
+          color = "green";
+        }
+        else if(t.type === "purchase"){
+          typeLabel = "DEBIT";
+          color = "red";
+        }
+
         body.innerHTML += `
           <tr>
-            <td>${t.plan}</td>
-            <td>₦${t.price}</td>
-            <td>${t.voucher || "Pending..."}</td>
+            <td>
+              <span style="color:${color};font-weight:600;">
+                ${typeLabel}
+              </span>
+              <br>
+              ${t.plan || "-"}
+            </td>
+
+            <td>₦${t.amount || t.price}</td>
+
+            <td>${t.voucher || "—"}</td>
+
             <td>${date}</td>
+
             <td>
               <button class="btn" style="padding:5px 8px;font-size:12px;"
                 onclick='printVoucher(${JSON.stringify(t)})'>
-                Print
+                View
               </button>
             </td>
           </tr>
