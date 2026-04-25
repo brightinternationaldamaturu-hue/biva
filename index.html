@@ -18,6 +18,68 @@
 
   <style>
 
+.menu-container {
+  position: relative;
+}
+
+.menu-icon {
+  font-size: 32px;
+  font-weight: bold;  
+  color: grey;          
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+/* Optional hover effect */
+.menu-icon:hover {
+  background: #ffe6e6;
+  color: #b30000;
+}
+
+.dropdown {
+  display: none;
+  position: absolute;
+  font-size: 24px;
+  top: 35px;
+  left: 0;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  overflow: hidden;
+  min-width: 160px;
+  z-index: 9999;
+}
+
+.dropdown a {
+  display: block;
+  padding: 10px;
+  text-decoration: none;
+  color: Teal;          
+  font-weight: bold;  
+  border-bottom: 1px solid #eee;
+}
+
+.dropdown a:hover {
+  background: #fff2f2;
+  color: #b30000; /* darker red on hover (optional) */
+}
+
+
+
+
+
+.page {
+  display: none;
+}
+
+.page.active {
+  display: block;
+}
+
+
+
+
 
 .download-btn {
   background: #25D366; /* green to stand out */
@@ -539,24 +601,22 @@ html, body {
 
 
 
-<header>
-  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:80px;border-radius:40px;">
-  <h1>BIVA</h1>
-  <div class="announcement">
-  <p>🔔 Welcome to Bright International Virtual Assistance Official Site •  Fast Internet • Reliable and Scured • Instant Wallet Deposite • Receive Voucher Code Instantly When You Buy Data • 24/7 Customer Support • Contact Us Anytime    📞08037807558 • Note: Our data package only work withing some part of damaturu •</p> 
-  </div>
 
-<span id="lastVoucher" style="margin-left:10px;font-weight:600;color:Cyan;"></span>
-</header>
 
 
 <nav>
 
-<div>
-  <a href="#voucher">Buy Data</a>
-  <a href="#partnership">Activate Voucher</a>
-  <a href="#partnership">Partnership</a>
-  <a href="#User">Profile</a>
+<div class="menu-container">
+  <span class="menu-icon" onclick="toggleMenu()">📜Menu</span>
+
+  <div id="dropdownMenu" class="dropdown">
+	<a href="#" onclick="showPage('about'); closeMenu()">Home</a>
+	<a href="#" onclick="showPage('voucher'); closeMenu()">Buy Data</a>
+	<a href="#" onclick="showPage('transactions'); closeMenu()">Transactions</a>
+	<a href="#" onclick="showPage('services'); closeMenu()">Services</a>
+	<a href="#" onclick="showPage('partnership'); closeMenu()">Voucher</a>
+	<a href="#" onclick="showPage('User'); closeMenu()">Profile</a>
+  </div>
 </div>
 
 
@@ -600,18 +660,36 @@ html, body {
 
 
 
-<section id="about">
+<section id="about" class="page active">
+<header>
+  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:80px;border-radius:40px;">
+  <h1>BIVA</h1>
+  <div class="announcement">
+  <p>🔔 Welcome to Bright International Virtual Assistance Official Site •  Fast Internet • Reliable and Scured • Instant Wallet Deposite • Receive Voucher Code Instantly When You Buy Data • 24/7 Customer Support • Contact Us Anytime    📞08037807558 • Note: Our data package only work withing some part of damaturu •</p> 
+  </div>
+
+<span id="lastVoucher" style="margin-left:10px;font-weight:600;color:Cyan;"></span>
+</header>
+
+
   <h2>About Us</h2>
   <p><strong>Bright International Virtual Assistance (BIVA)</strong> is a fully registered digital service and internet solutions company committed to delivering reliable, affordable, and high-quality virtual assistance and internet services across Nigeria and beyond.</p>
   <p>We specialize in providing seamless connectivity solutions, internet voucher services, and professional virtual support for individuals, small businesses, and corporate organizations. Our goal is to help clients stay connected, productive, and efficient in today’s fast-paced digital world.</p>
   <p>At BIVA, we believe that access to the internet and professional support services should be simple, fast, and affordable. That is why we continuously improve our infrastructure, customer service, and service delivery to ensure maximum satisfaction for all our users.</p>
   <p>We are also deeply committed to customer satisfaction, offering 24/7 support and ensuring that every client receives timely assistance whenever needed. Whether you are purchasing data vouchers, managing online tasks, or seeking technical support, BIVA is your trusted digital partner.</p>
   <p><em>Our vision is to become one of the leading virtual assistance and internet service providers in Africa, empowering individuals and businesses through reliable digital connectivity and support solutions.</em></p>
+
+<footer>
+  <p>© 2026 BIVA. All Rights Reserved.</p>
+  <p>Email: brightinternationaldamaturu@gmail.com</p>
+  <p>Phone: +234 080 3780 7558</p>
+</footer>
+
 </section>
 
 
 <section>
-  <h2>Why Choose Us</h2>
+  <section id="why" class="page">
   <div class="grid">
     <div class="card"><h3>⚡ Fast Internet</h3><p>Reliable high-speed connectivity.</p></div>
     <div class="card"><h3>💰 Affordable</h3><p>Flexible plans for everyone.</p></div>
@@ -620,7 +698,7 @@ html, body {
 </section>
 
 
-<section id="services">
+<section id="services" class="page">
   <h2>Our Services</h2>
   <div class="grid">
     <div class="card"><h3>Administrative Support</h3></div>
@@ -633,7 +711,7 @@ html, body {
 </section>
 
 
-<section id="media">
+<section id="media" class="page">
   <h2>Highlights</h2>
   <div class="grid">
     <div class="card"><img class="media-img" src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1775820063/1_u1x1if.png"></div>
@@ -642,12 +720,12 @@ html, body {
   </div>
 </section>
 
-<section id="voucher">
+<section id="voucher" class="page">
   <h2>Buy Data</h2>
   <div id="plans"></div>
 </section>
 
-<section id="transactions">
+<section id="transactions" class="page">
   <h2>Transaction History</h2>
   <div class="card" style="overflow:auto;max-height:350px;">
   <table id="transactionTable">
@@ -666,7 +744,7 @@ html, body {
 </section>
 
 
-<section id="partnership">
+<section id="partnership" class="page">
   <h2>Partnership Program</h2>
   <div class="card" style="text-align:left;padding:20px;">
     <p>Join the BIVA Partnership Program and earn income by reselling internet vouchers.</p>
@@ -679,7 +757,7 @@ html, body {
 
 
 
-<section id="User">
+<section id="User" class="page">
   <h2>User</h2>
 
     <span class=" ">User:</span> 
@@ -688,11 +766,7 @@ html, body {
 </section>
 
 
-<footer>
-  <p>© 2026 BIVA. All Rights Reserved.</p>
-  <p>Email: brightinternationaldamaturu@gmail.com</p>
-  <p>Phone: +234 080 3780 7558</p>
-</footer>
+
 
 <a class="chat-btn" href="https://wa.me/2348037807558" target="_blank">💬</a>
 
@@ -725,6 +799,31 @@ html, body {
 
 
 <script>
+function showPage(pageId) {
+  // hide all pages
+  document.querySelectorAll('.page').forEach(p => {
+    p.classList.remove('active');
+  });
+
+  // show selected
+  document.getElementById(pageId).classList.add('active');
+
+  // ✅ close menu automatically
+  closeMenu();
+
+  // scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function closeMenu() {
+  document.getElementById("dropdownMenu").style.display = "none";
+}
+
+
+
+
+
+
 function saveOmadaSession(user){
   const params = new URLSearchParams(window.location.search);
 
@@ -1579,8 +1678,20 @@ function openInvoice(){
 
 
 
+function toggleMenu() {
+  const menu = document.getElementById("dropdownMenu");
+  menu.style.display = menu.style.display === "block" ? "none" : "block";
+}
 
+// Optional: close menu when clicking outside
+document.addEventListener("click", function(e) {
+  const menu = document.getElementById("dropdownMenu");
+  const icon = document.querySelector(".menu-icon");
 
+  if (!menu.contains(e.target) && e.target !== icon) {
+    menu.style.display = "none";
+  }
+});
 
 
 
