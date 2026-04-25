@@ -18,6 +18,22 @@
 
   <style>
 
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 5px solid rgba(255,255,255,0.2);
+  border-top: 5px solid #ff1a1a;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
+
+
 .menu-container {
   position: relative;
 }
@@ -772,7 +788,7 @@ html, body {
 
     <span class=" ">User:</span> 
     <span id="userEmail" style="margin-right:10px;font-weight:600;color:Red;"></span>
-    <button class="btn" id="logoutBtn" onclick="logout()" style="display:none">Logout</button>
+    <button class="btn" id="logoutBtn" onclick="openLogoutBox()" style="display:none">Logout</button>
 </section>
 
 
@@ -809,6 +825,23 @@ html, body {
 
 
 <script>
+
+
+function showLoader(text = "Please wait...") {
+  const loader = document.getElementById("globalLoader");
+  loader.querySelector("p").innerText = text;
+  loader.style.display = "flex";
+}
+
+function hideLoader() {
+  document.getElementById("globalLoader").style.display = "none";
+}
+
+
+
+
+
+
 function showPage(pageId) {
   // hide all pages
   document.querySelectorAll('.page').forEach(p => {
@@ -915,24 +948,15 @@ function closeModal(){document.getElementById('modal').style.display='none'}
 
 
 async function signup(){
+  showLoader("Creating account...");
+
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
-
-  if(!email || !password){
-    showAlert("Please fill all fields", "warning");
-    return;
-  }
-
-  if(password.length < 6){
-    showAlert("Password must be at least 6 characters", "warning");
-    return;
-  }
 
   try{
     const cred = await auth.createUserWithEmailAndPassword(email, password);
     const user = cred.user;
 
-    // ✅ Save user properly
     await db.collection("users").doc(user.uid).set({
       email: user.email,
       wallet: 0,
@@ -945,8 +969,13 @@ async function signup(){
 
   }catch(err){
     showAlert(err.message, "error");
+
+  }finally{
+    hideLoader();
   }
 }
+
+
 
 
     // ✅Bonus Calculator
@@ -1067,29 +1096,22 @@ callback: async function (response) {
 
 
 async function login(){
+  showLoader("Signing you in...");
+
   const email = document.getElementById('email').value.trim();
   const password = document.getElementById('password').value;
-
-  if(!email || !password){
-    showAlert("Enter email and password", "warning");
-    return;
-  }
 
   try{
     const userCredential = await auth.signInWithEmailAndPassword(email, password);
     const user = userCredential.user;
 
- // FORCE refresh current user
     await user.reload();
 
     document.getElementById("userEmail").innerText = user.email;
 
-
-
     const ref = db.collection("users").doc(user.uid);
     const doc = await ref.get();
 
-    // ✅ If user doc missing, create it
     if(!doc.exists){
       await ref.set({
         email: user.email,
@@ -1103,19 +1125,31 @@ async function login(){
 
   }catch(err){
     showAlert(err.message, "error");
+
+  }finally{
+    hideLoader();
   }
 }
 
 
 
 
-function logout(){
-  auth.signOut()
-    .then(() => {
-    })
-    .catch(err => {
-      showAlert("Error: " + err.message);
-    });
+async function logout(){
+  showLoader("Signing you out...");
+
+  try {
+    await auth.signOut();
+
+    // optional cleanup UI
+    document.getElementById("userEmail").innerText = "";
+    showAlert("👋 Logged out successfully");
+
+  } catch (err) {
+    showAlert("Error: " + err.message, "error");
+
+  } finally {
+    hideLoader();
+  }
 }
 
 
@@ -1711,7 +1745,32 @@ document.addEventListener("click", function(e) {
 
 
 
+function openLogoutBox(){
+  document.getElementById("logoutBox").style.display = "flex";
+}
 
+function closeLogoutBox(){
+  document.getElementById("logoutBox").style.display = "none";
+}
+
+async function confirmLogout(){
+  closeLogoutBox();
+  showLoader("Logging you out...");
+
+  try {
+    await auth.signOut();
+
+    document.getElementById("userEmail").innerText = "";
+
+    showAlert("👋 You have been logged out");
+
+  } catch (err) {
+    showAlert(err.message, "error");
+
+  } finally {
+    hideLoader();
+  }
+}
 
 
 </script>
@@ -1883,5 +1942,54 @@ document.addEventListener("click", function(e) {
 
 </div>
 
+
+
+
+
+
+
+
+
+
+
+<!-- GLOBAL LOADING OVERLAY -->
+<div id="globalLoader" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.65);
+  backdrop-filter:blur(6px);
+  z-index:999999;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+">
+
+  <div class="spinner"></div>
+
+  <p style="
+    color:#fff;
+    margin-top:15px;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:1px;
+  ">
+    Please wait...
+  </p>
+</div>
+
+
+<div id="logoutBox" class="modal" style="display:none;">
+  <div class="modal-content">
+    <h3>Confirm Logout</h3>
+    <p>Are you sure you want to log out?</p>
+
+    <button class="btn" onclick="confirmLogout()">Yes, Logout</button>
+    <button class="btn" onclick="closeLogoutBox()" style="background:gray;">Cancel</button>
+  </div>
+</div>
 </body>
 </html>
