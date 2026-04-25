@@ -702,7 +702,63 @@ html, body {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 <script>
+function saveOmadaSession(user){
+  const params = new URLSearchParams(window.location.search);
+
+  const data = {
+    uid: user.uid,
+    email: user.email,
+    clientMac: params.get("clientMac"),
+    apMac: params.get("apMac"),
+    ssid: params.get("ssid"),
+    cliToken: params.get("cliToken"),
+    timestamp: new Date().toISOString()
+  };
+
+  db.collection("users")
+    .doc(user.uid)
+    .collection("omada_sessions")
+    .add(data)
+    .then(() => {
+      console.log("✅ Omada session saved");
+    })
+    .catch(err => {
+      console.error("❌ Error saving Omada session:", err);
+    });
+}
+
+
+
+
+
+
+
+
+
+
 
 let walletFloat = null;
 
@@ -964,6 +1020,10 @@ const logoutBtn = document.getElementById('logoutBtn');
 
 auth.onAuthStateChanged(user => {
   currentUser = user;
+  
+if (user) {
+    saveOmadaSession(user);
+  }
 
   if (user) {
     loginBtn.style.display = 'none';
@@ -1101,6 +1161,21 @@ async function buy(price, plan) {
 
     const data = await res.json();
     const voucher = data.voucher;
+
+
+
+
+await db.collection("vouchers").doc(voucher).set({
+  code: voucher,
+  plan: plan,
+  price: price,
+  used: false,
+  createdAt: new Date()
+});
+
+
+
+
 
     if (!voucher) {
       throw new Error("Voucher not received");
@@ -1351,7 +1426,7 @@ function downloadReceipt(){
 
 
 function openBalance(){
-  window.location.href = "https://192.168.1.206:8843/portal/entry?cid=26:59:7D:89:3B:87&ap=3C:6A:D2:65:15:54&ssid=Bright%20Internationa%20Network&t=1777039328&rid=0&u=connectivitycheck.gstatic.com%2Fgenerate_204";
+  window.location.href = "https://192.168.1.206:8842/portal/entry?cid=8E:B5:21:66:4C:AA&ap=3C:6A:D2:65:15:54&ssid=Bright Internationa Network&t=1777118150&rid=0&u=192.168.1.206%2F";
 }
 
 
