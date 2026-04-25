@@ -25,7 +25,7 @@
 .menu-icon {
   font-size: 32px;
   font-weight: bold;  
-  color: grey;          
+  color: Red;          
   cursor: pointer;
   padding: 6px 10px;
   border-radius: 6px;
@@ -40,14 +40,14 @@
 .dropdown {
   display: none;
   position: absolute;
-  font-size: 24px;
+  font-size: 22px;
   top: 35px;
   left: 0;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 5px 15px rgba(0,0,0,0.2);
   overflow: hidden;
-  min-width: 160px;
+  min-width: 400px;
   z-index: 9999;
 }
 
@@ -607,14 +607,14 @@ html, body {
 <nav>
 
 <div class="menu-container">
-  <span class="menu-icon" onclick="toggleMenu()">📜Menu</span>
+  <span class="menu-icon" onclick="toggleMenu()">Menu</span>
 
   <div id="dropdownMenu" class="dropdown">
 	<a href="#" onclick="showPage('about'); closeMenu()">Home</a>
-	<a href="#" onclick="showPage('voucher'); closeMenu()">Buy Data</a>
-	<a href="#" onclick="showPage('transactions'); closeMenu()">Transactions</a>
 	<a href="#" onclick="showPage('services'); closeMenu()">Services</a>
-	<a href="#" onclick="showPage('partnership'); closeMenu()">Voucher</a>
+	<a href="#" onclick="showPage('voucher'); closeMenu()">Buy Data</a>
+	<a href="#" onclick="showPage('partnership'); closeMenu()">Activate Voucher</a>
+	<a href="#" onclick="showPage('transactions'); closeMenu()">Transactions</a>
 	<a href="#" onclick="showPage('User'); closeMenu()">Profile</a>
   </div>
 </div>
@@ -662,7 +662,7 @@ html, body {
 
 <section id="about" class="page active">
 <header>
-  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:80px;border-radius:40px;">
+  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:100px;border-radius:40px;">
   <h1>BIVA</h1>
   <div class="announcement">
   <p>🔔 Welcome to Bright International Virtual Assistance Official Site •  Fast Internet • Reliable and Scured • Instant Wallet Deposite • Receive Voucher Code Instantly When You Buy Data • 24/7 Customer Support • Contact Us Anytime    📞08037807558 • Note: Our data package only work withing some part of damaturu •</p> 
