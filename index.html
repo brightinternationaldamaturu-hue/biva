@@ -17,6 +17,53 @@
 
 
   <style>
+.main-header {
+  background: radial-gradient(circle at top, #ff1a1a, #8B0000);
+  color: #fff;
+  text-align: center;
+  padding: 8px 10px 6px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* subtle glow effect */
+.main-header::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 100px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+  filter: blur(80px);
+}
+
+.logo {
+  width: 90px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.main-header h1 {
+  font-size: 1.8rem;
+  margin: 3px 0;
+  letter-spacing: 0px;
+}
+
+.tagline {
+  opacity: 0.9;
+  font-size: 1rem;
+  margin-bottom: 2px;
+}
+
+
+
+
+
+
+
 
 .spinner {
   width: 60px;
@@ -39,7 +86,7 @@
 }
 
 .menu-icon {
-  font-size: 32px;
+  font-size: 26px;
   font-weight: bold;  
   color: Red;          
   cursor: pointer;
@@ -134,22 +181,10 @@
       background:#fff5f5;
       color:#333;
       scroll-behavior:smooth;
-      animation:pageLoad 1.6s ease;
-    }
-
-
-    header {
-      background:linear-gradient(135deg,#8B0000,#ff1a1a);
-      color:#fff;
-      padding:60px 20px;
-      text-align:center;
-      border-bottom:4px solid #b30000;
       animation:fadeDown 1.4s ease;
     }
-    header h1 {margin:0; font-size:2.5rem;}
 
 
-    nav a{margin-right:15px;text-decoration:none;color:#8B0000;font-weight:600;}
 
 
  #about {
@@ -159,6 +194,7 @@
       border-radius:15px;
       box-shadow:0 10px 25px rgba(0,0,0,0.05);
       margin-top:30px;
+      animation:fadeDown 1.4s ease;
     }
 
     h2 {
@@ -624,15 +660,17 @@ html, body {
 <nav>
 
 <div class="menu-container">
-  <span class="menu-icon" onclick="toggleMenu()">Menu</span>
+  <span class="menu-icon" onclick="toggleMenu()">📜Menu</span>
 
   <div id="dropdownMenu" class="dropdown">
 	<a href="#" onclick="showPage('about'); closeMenu()">Home</a>
 	<a href="#" onclick="showPage('services'); closeMenu()">Services</a>
 	<a href="#" onclick="showPage('voucher'); closeMenu()">Buy Data</a>
-	<a href="#" onclick="showPage('partnership'); closeMenu()">Activate Voucher</a>
 	<a href="#" onclick="showPage('transactions'); closeMenu()">Transactions</a>
 	<a href="#" onclick="showPage('User'); closeMenu()">Profile</a>
+        <a href="#" id="activateBtn" style="display:block;" onclick="openBalance(); closeMenu()">
+  Activate Voucher
+</a>
   </div>
 </div>
 
@@ -645,12 +683,6 @@ html, body {
 
 
 
-<a href="https://drive.google.com/uc?export=download&id=1xE1sZylAidG84YJkoOvCE031RG9E4gXH"
-   class="btn download-btn"
-   target="_blank"
-   download>
-   ⬇ Download App
-</a>
 
 </a>
     <button class="btn" onclick="fundWallet()">Fund Wallet</button>
@@ -684,19 +716,25 @@ html, body {
 
 
 
+<header id="mainHeader" class="main-header">
+  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" class="logo">
+
+  <h1>BIVA</h1>
+
+  <p class="tagline">
+    Premium Virtual Assistance & Internet Services
+  </p>
+
+  <div class="announcement">
+    <p>
+      🔔 Welcome to Bright International Virtual Assistance • Fast Internet • Reliable & Secure • Instant Wallet Deposit • 24/7 Support 📞08037807558
+    </p>
+  </div>
+</header>
+
 
 
 <section id="about" class="page active">
-<header>
-  <img src="https://res.cloudinary.com/djcnsgbzr/image/upload/v1774348546/3_jauepg.jpg" style="max-width:100px;border-radius:40px;">
-  <h1>BIVA</h1>
-  <div class="announcement">
-  <p>🔔 Welcome to Bright International Virtual Assistance Official Site •  Fast Internet • Reliable and Scured • Instant Wallet Deposite • Receive Voucher Code Instantly When You Buy Data • 24/7 Customer Support • Contact Us Anytime    📞08037807558 • Note: Our data package only work withing some part of damaturu •</p> 
-  </div>
-
-<span id="lastVoucher" style="margin-left:10px;font-weight:600;color:Cyan;"></span>
-</header>
-
 
   <h2>About Us</h2>
   <p><strong>Bright International Virtual Assistance (BIVA)</strong> is a fully registered digital service and internet solutions company committed to delivering reliable, affordable, and high-quality virtual assistance and internet services across Nigeria and beyond.</p>
@@ -705,10 +743,18 @@ html, body {
   <p>We are also deeply committed to customer satisfaction, offering 24/7 support and ensuring that every client receives timely assistance whenever needed. Whether you are purchasing data vouchers, managing online tasks, or seeking technical support, BIVA is your trusted digital partner.</p>
   <p><em>Our vision is to become one of the leading virtual assistance and internet service providers in Africa, empowering individuals and businesses through reliable digital connectivity and support solutions.</em></p>
 
+
 <footer>
   <p>© 2026 BIVA. All Rights Reserved.</p>
   <p>Email: brightinternationaldamaturu@gmail.com</p>
   <p>Phone: +234 080 3780 7558</p>
+<a href="https://drive.google.com/uc?export=download&id=1xE1sZylAidG84YJkoOvCE031RG9E4gXH"
+   class="btn download-btn"
+   target="_blank"
+   download>
+   ⬇ Download Our New App
+</a>
+
 </footer>
 
 </section>
@@ -775,7 +821,6 @@ html, body {
   <div class="card" style="text-align:left;padding:20px;">
     <p>Join the BIVA Partnership Program and earn income by reselling internet vouchers.</p>
     <a class="btn" href="https://form.jotform.com/260963343803054" target="_blank">Apply for Partnership</a>
-    <button class="btn" onclick="openBalance()">Activate Voucher</button>
     <button class="btn" onclick="openInvoice()">Submit Invoice</button>
   </div>
 
@@ -789,6 +834,8 @@ html, body {
     <span class=" ">User:</span> 
     <span id="userEmail" style="margin-right:10px;font-weight:600;color:Red;"></span>
     <button class="btn" id="logoutBtn" onclick="openLogoutBox()" style="display:none">Logout</button>
+
+
 </section>
 
 
@@ -848,15 +895,31 @@ function showPage(pageId) {
     p.classList.remove('active');
   });
 
-  // show selected
+  // show selected page
   document.getElementById(pageId).classList.add('active');
 
-  // ✅ close menu automatically
+  // ✅ CONTROL HEADER VISIBILITY
+  const header = document.getElementById("mainHeader");
+
+  if (pageId === "about") {
+    header.style.display = "block";
+  } else {
+    header.style.display = "none";
+  }
+
+  // close menu
   closeMenu();
 
   // scroll to top
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+
+
+
+
+
+
+
 
 function closeMenu() {
   document.getElementById("dropdownMenu").style.display = "none";
@@ -1351,6 +1414,8 @@ await db.collection("vouchers").doc(voucher).set({
 
     // 🎉 SUCCESS
     showAlert("✅ Purchase successful!");
+	// ✅ Show Activate button
+	document.getElementById("activateBtn").style.display = "block";
 
     printVoucher({
       email: currentUser.email,
@@ -1847,7 +1912,9 @@ async function confirmLogout(){
     text-align:left;
   ">
 
-    <h2 style="color:#8B0000;text-align:center;">BIVA Receipt</h2>
+    <h2 style="color:#8B0000;text-align:center;">
+  ✅ Purchase Successful
+</h2>
 
     <p><strong>Email:</strong> <span id="r_email"></span></p>
     <p><strong>Plan:</strong> <span id="r_plan"></span></p>
@@ -1855,10 +1922,15 @@ async function confirmLogout(){
     <p><strong>Voucher:</strong> <span id="r_voucher"></span></p>
     <p><strong>Date:</strong> <span id="r_date"></span></p>
 
-    <div style="margin-top:10px; display:flex; gap:8px;">
-      <button class="btn" onclick="downloadReceipt()">⬇ Download</button>
-      <button class="btn" onclick="printReceipt()">🖨 Print</button>
-    </div>
+<div style="margin-top:10px; display:flex; gap:8px; flex-wrap:wrap;">
+
+  <button class="btn" onclick="openBalance()">⚡ Activate</button>
+
+  <button class="btn" onclick="downloadReceipt()">⬇ Download</button>
+
+  <button class="btn" onclick="printReceipt()">🖨 Print</button>
+
+</div>
 
     <button class="btn" style="background:gray;width:100%;margin-top:10px;" onclick="closeReceipt()">Close</button>
 
