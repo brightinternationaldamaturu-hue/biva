@@ -17,6 +17,84 @@
 
 
   <style>
+.loader-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  z-index: 999999;
+  justify-content: center;
+  align-items: center;
+}
+
+.loader-box {
+  background: #111;
+  padding: 30px;
+  border-radius: 16px;
+  text-align: center;
+  width: 90%;
+  max-width: 320px;
+  color: #fff;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  animation: fadeIn 0.4s ease;
+}
+
+/* LOGO PULSE */
+.logo-pulse {
+  width: 60px;
+  height: 60px;
+  margin: auto;
+  border-radius: 50%;
+  background: radial-gradient(circle, #ff1a1a, #8B0000);
+  animation: pulse 1.2s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(0.9); opacity: 0.7; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(0.9); opacity: 0.7; }
+}
+
+/* PROGRESS BAR */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #333;
+  border-radius: 10px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  width: 0%;
+  height: 100%;
+  background: linear-gradient(90deg, #ff1a1a, #ff4d4d);
+  transition: width 0.4s ease;
+}
+
+/* TEXT */
+.loader-box h3 {
+  margin-top: 15px;
+  font-size: 18px;
+}
+
+.loader-box p {
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 .main-header {
   background: radial-gradient(circle at top, #ff1a1a, #8B0000);
   color: #fff;
@@ -588,7 +666,7 @@ nav div {
     position: absolute;
     left: 0;
     top: 0;
-    width: 58mm;
+    width: auto;
     padding: 10px;
     font-family: monospace;
     font-size: 12px;
@@ -872,12 +950,40 @@ html, body {
 
 
 <script>
+let loaderInterval;
 
-
-function showLoader(text = "Please wait...") {
+function showLoader(title = "Processing...", text = "Please wait...") {
   const loader = document.getElementById("globalLoader");
-  loader.querySelector("p").innerText = text;
+
+  document.getElementById("loaderTitle").innerText = title;
+  document.getElementById("loaderText").innerText = text;
+
   loader.style.display = "flex";
+
+  // animate fake progress
+  let progress = 0;
+  const bar = document.getElementById("progressFill");
+
+  clearInterval(loaderInterval);
+
+  loaderInterval = setInterval(() => {
+    if (progress < 90) {
+      progress += Math.random() * 15;
+      bar.style.width = progress + "%";
+    }
+  }, 400);
+}
+
+function hideLoader() {
+  const bar = document.getElementById("progressFill");
+
+  bar.style.width = "100%";
+
+  setTimeout(() => {
+    document.getElementById("globalLoader").style.display = "none";
+    bar.style.width = "0%";
+    clearInterval(loaderInterval);
+  }, 500);
 }
 
 function hideLoader() {
@@ -1341,6 +1447,8 @@ async function buy(price, plan) {
         throw new Error("Insufficient balance");
       }
 
+
+
       // Deduct wallet atomically
       transaction.update(userRef, {
         wallet: wallet - price
@@ -1348,6 +1456,7 @@ async function buy(price, plan) {
 
       return { walletAfter: wallet - price };
     });
+                                      showLoader("Generating Voucher", "Please wait while we fetch your data...");
 
     // 🌐 STEP 3: Call webhook ONLY ONCE (after successful deduction)
     const res = await fetch("https://hook.us2.make.com/pm61x9gphx81e59lrvy1q7tmnfsd7ggo", {
@@ -1411,7 +1520,7 @@ await db.collection("vouchers").doc(voucher).set({
     await userRef.update({
       lastVoucher: voucher
     });
-
+                                                          showLoader("Finalizing", "Almost done...");
     // 🎉 SUCCESS
     showAlert("✅ Purchase successful!");
 	// ✅ Show Activate button
@@ -1431,6 +1540,8 @@ await db.collection("vouchers").doc(voucher).set({
   } finally {
     // 🔓 STEP 7: ALWAYS release lock (critical)
     await lockRef.set({ locked: false });
+                      showLoader("Processing Purchase", "Securing payment & generating voucher...");
+                                                                          hideLoader();
   }
 }
 
@@ -2025,33 +2136,28 @@ async function confirmLogout(){
 
 
 <!-- GLOBAL LOADING OVERLAY -->
-<div id="globalLoader" style="
-  display:none;
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.65);
-  backdrop-filter:blur(6px);
-  z-index:999999;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-">
+<div id="globalLoader" class="loader-overlay">
 
-  <div class="spinner"></div>
+  <div class="loader-box">
 
-  <p style="
-    color:#fff;
-    margin-top:15px;
-    font-size:16px;
-    font-weight:600;
-    letter-spacing:1px;
-  ">
-    Please wait...
-  </p>
+    <!-- Animated Logo Pulse -->
+    <div class="logo-pulse"></div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <!-- Text -->
+    <h3 id="loaderTitle">Processing...</h3>
+    <p id="loaderText">Please wait while we complete your request</p>
+
+  </div>
+
 </div>
+
+
+
 
 
 <div id="logoutBox" class="modal" style="display:none;">
