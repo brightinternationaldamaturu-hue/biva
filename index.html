@@ -1555,6 +1555,7 @@ function loadTransactions(uid){
 
   db.collection("transactions")
     .where("userId", "==", uid)
+    .orderBy("createdAt", "desc")
     .onSnapshot(snapshot => {
 
       body.innerHTML = "";
@@ -1575,7 +1576,7 @@ function loadTransactions(uid){
           ? t.createdAt.toDate().toLocaleString()
           : "Just now";
 
-        // 🔥 Decide label + color
+        // Default styling
         let typeLabel = "UNKNOWN";
         let color = "#333";
 
@@ -1586,6 +1587,10 @@ function loadTransactions(uid){
         else if(t.type === "purchase"){
           typeLabel = "DEBIT";
           color = "red";
+        }
+        else if(t.type === "bonus"){
+          typeLabel = "BONUS";
+          color = "blue";
         }
 
         body.innerHTML += `
@@ -1598,7 +1603,13 @@ function loadTransactions(uid){
               ${t.plan || "-"}
             </td>
 
-            <td>₦${t.amount || t.price}</td>
+            <td>
+              ₦${t.amount || t.price || 0}
+
+              ${t.bonus ? `<br><small style="color:green;font-weight:600;">+ ₦${t.bonus} bonus</small>` : ""}
+
+              ${t.total ? `<br><small style="color:#555;">Total: ₦${t.total}</small>` : ""}
+            </td>
 
             <td>${t.voucher || "—"}</td>
 
