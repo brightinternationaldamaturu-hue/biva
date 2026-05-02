@@ -17,6 +17,27 @@
 
 
   <style>
+.wallet-card{
+  display:inline-block;
+  background:#ffffff;
+  border:2px solid teal;
+  color:teal;
+  font-weight:bold;
+  font-size:28px;
+  padding:6px 14px;
+  border-radius:20px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+  transition:0.3s;
+  width:auto;              /* auto size */
+  white-space:nowrap;     /* prevent wrapping */
+}
+
+.wallet-card:hover{
+  transform:scale(1.05);
+}
+
+
+
 .loader-overlay {
   display: none;
   position: fixed;
@@ -761,7 +782,7 @@ html, body {
 
 <div class="right-nav">
 
-  <span id="wallet" class="wallet-box">₦0</span>
+
 
 
 
@@ -913,9 +934,16 @@ html, body {
 <section id="User" class="page">
   <h2>User</h2>
 
-    <span class=" ">User:</span> 
     <span id="userEmail" style="margin-right:10px;font-weight:600;color:Red;"></span>
-    <button class="btn" id="logoutBtn" onclick="openLogoutBox()" style="display:none">Logout</button>
+
+     <h2>Wallet Balance</h2>
+     <div id="walletCard" class="wallet-card">
+     <span id="wallet">0</span>
+     </div>
+
+
+     <button class="btn" id="logoutBtn" onclick="openLogoutBox()" style="display:none">Logout</button>
+
 
 
 </section>
