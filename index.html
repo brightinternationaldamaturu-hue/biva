@@ -531,14 +531,14 @@ nav div {
   top: 100px; /* adjust if needed */
   right: 15px; /* move to right */
   
-  background: #ff1a1a;
+  background: Teal;
   color: #fff;
 
   padding: 8px 14px; /* auto size */
   border-radius: 30px; /* pill shape */
 
   font-weight: bold;
-  font-size: 14px;
+  font-size: 28px;
 
   display: inline-block;
   width: auto; /* 🔥 IMPORTANT */
@@ -785,17 +785,19 @@ html, body {
 <div class="menu-container">
   <span class="menu-icon" onclick="toggleMenu()">☰ Menu</span>
 
-  <div id="dropdownMenu" class="dropdown">
+<div id="dropdownMenu" class="dropdown">
 	<a href="#" onclick="showPage('about'); closeMenu()">Home</a>
 	<a href="#" onclick="showPage('User'); closeMenu()">Profile</a>
 	<a href="#" onclick="showPage('services'); closeMenu()">Services</a>
 	<a href="#" onclick="showPage('voucher'); closeMenu()">Buy Data</a>
+        <a href="#" onclick="showPage('partnership'); closeMenu()">Partnership</a>
+        <a href="#" onclick="fundWallet(); closeMenu()">Fund Wallet</a>
 	<a href="#" onclick="showPage('transactions'); closeMenu()">Transactions</a>
         <a href="#" id="activateBtn" style="display:block;" onclick="openBalance(); closeMenu()">
-  Activate Voucher
-</a>
-<a href="#" onclick="showPage('partnership'); closeMenu()">Partnership</a>
-  </div>
+      Activate Voucher
+    </a>
+
+</div>
 </div>
 
 
@@ -809,7 +811,6 @@ html, body {
 
 
 </a>
-    <button class="btn" onclick="fundWallet()">Fund Wallet</button>
     <button class="btn" id="loginBtn" onclick="openModal()">Login</button>
 </div>
 
