@@ -17,6 +17,18 @@
 
 
   <style>
+/* ===== GLOBAL UI LAYER SYSTEM ===== */
+:root {
+  --z-base: 1;
+  --z-nav: 1000;
+  --z-dropdown: 5000;
+  --z-modal: 100000;
+  --z-loader: 500000;
+  --z-alert: 9999999; /* ALWAYS TOP */
+}
+
+
+
 
 .email-box{
   display:inline-block;
@@ -538,7 +550,7 @@ nav div {
   border-radius: 30px; /* pill shape */
 
   font-weight: bold;
-  font-size: 28px;
+  font-size: 22px;
 
   display: inline-block;
   width: auto; /* 🔥 IMPORTANT */
@@ -828,6 +840,18 @@ html, body {
 
 
 
+.toast-container{
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 99999999; /* higher than everything */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
 
   </style>
 </head>
@@ -1044,7 +1068,7 @@ html, body {
 <a class="chat-btn" href="https://wa.me/2348037807558" target="_blank">💬</a>
 
 
-<div id="customAlert" style="position:fixed;top:20px;right:20px;z-index:9999;"></div>
+<div id="customAlert" class="toast-container"></div>
 
 
 
@@ -1205,22 +1229,30 @@ if (walletFloat) walletFloat.innerText = '₦' + balance;
 function showAlert(message, type="success"){
   const alertBox = document.createElement("div");
 
-  let bg = "#28a745"; // success
+  let bg = "#28a745";
   if(type === "error") bg = "#dc3545";
   if(type === "warning") bg = "#ffc107";
 
   alertBox.style.background = bg;
   alertBox.style.color = "#fff";
   alertBox.style.padding = "12px 18px";
-  alertBox.style.marginTop = "10px";
-  alertBox.style.borderRadius = "8px";
-  alertBox.style.boxShadow = "0 4px 10px rgba(0,0,0,0.2)";
+  alertBox.style.borderRadius = "10px";
+  alertBox.style.boxShadow = "0 10px 25px rgba(0,0,0,0.3)";
   alertBox.style.fontWeight = "600";
+  alertBox.style.minWidth = "250px";
+  alertBox.style.textAlign = "center";
+  alertBox.style.pointerEvents = "auto";
+  alertBox.style.animation = "fadeDown 0.3s ease";
+  
   alertBox.innerText = message;
 
   document.getElementById("customAlert").appendChild(alertBox);
 
-  setTimeout(()=>{ alertBox.remove(); }, 4000);
+  setTimeout(()=>{
+    alertBox.style.opacity = "0";
+    alertBox.style.transform = "translateY(-10px)";
+    setTimeout(()=>alertBox.remove(), 300);
+  }, 3500);
 }
 
 
