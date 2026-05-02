@@ -17,6 +17,27 @@
 
 
   <style>
+
+.email-box{
+  display:inline-block;
+  background:#fff;
+  border:2px solid teal;
+  padding:8px 14px;
+  border-radius:10px;
+  font-size:18px;        /* bigger text */
+  font-weight:600;
+  color:teal;
+  width:auto;            /* auto resize */
+  max-width:100%;
+  white-space:nowrap;    /* keep in one line */
+  overflow:hidden;
+  text-overflow:ellipsis;
+  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+
+
+
 .wallet-card{
   display:inline-block;
   background:#ffffff;
@@ -932,11 +953,14 @@ html, body {
 
 
 <section id="User" class="page">
-  <h2>User</h2>
+  <h2>User:</h2>
+ <div class="email-box">
+  <span id="userEmail"></span>
+</div>
 
-    <span id="userEmail" style="margin-right:10px;font-weight:600;color:Red;"></span>
 
-     <h2>Wallet Balance</h2>
+
+     <h2>Wallet Balance :</h2>
      <div id="walletCard" class="wallet-card">
      <span id="wallet">0</span>
      </div>
