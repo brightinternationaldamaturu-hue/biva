@@ -252,19 +252,38 @@
 .dropdown a{
   display:flex;
   align-items:center;
-  gap:10px;
-  padding:14px 16px;
+  gap:8px;
+  padding:10px 14px;
   text-decoration:none;
   color:#333;
   font-weight:500;
   transition:0.25s;
   border-bottom:1px solid #f4f4f4;
+  font-size:14px;
 }
 
 .dropdown a:hover{
   background:#fff5f5;
   color:#8B0000;
   padding-left:22px;
+}
+
+@media (max-width:768px){
+
+  .dropdown{
+    width:230px;
+    border-radius:14px;
+  }
+
+  .dropdown a{
+    padding:9px 12px;
+    font-size:13px;
+  }
+
+  .menu-icon{
+    padding:8px 12px;
+    font-size:14px;
+  }
 }
 
 
@@ -838,30 +857,70 @@ nav div {
 }
 
 
-#transactionTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
+/* =========================
+   TRANSACTION TABLE FIX
+========================= */
+
+.transaction-wrapper{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  border-radius:15px;
+}
+
+#transactionTable{
+  width:100%;
+  min-width:650px; /* prevents table crush */
+  border-collapse:collapse;
+  font-size:14px;
+  background:#fff;
 }
 
 #transactionTable th,
-#transactionTable td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  text-align: left;
+#transactionTable td{
+  padding:12px 10px;
+  border-bottom:1px solid #eee;
+  text-align:left;
+  white-space:nowrap;
 }
 
-#transactionTable th {
-  background: #8B0000;
-  color: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+#transactionTable th{
+  background:#8B0000;
+  color:#fff;
+  position:sticky;
+  top:0;
+  z-index:2;
 }
 
-#transactionTable tr:hover {
-  background: #fff2f2;
+#transactionTable tr:hover{
+  background:#fff5f5;
 }
+
+/* MOBILE */
+@media (max-width:768px){
+
+  .transaction-wrapper{
+    border-radius:12px;
+  }
+
+  #transactionTable{
+    font-size:12px;
+    min-width:560px;
+  }
+
+  #transactionTable th,
+  #transactionTable td{
+    padding:8px 6px;
+  }
+
+  #transactionTable td button{
+    padding:6px 8px !important;
+    font-size:11px !important;
+  }
+}
+
+
+
 
 @media (max-width: 768px) {
   #transactionTable {
@@ -963,12 +1022,12 @@ body{
 /* MENU SECTION TITLES */
 
 .menu-title{
-  padding:10px 14px;
-  font-size:12px;
+  padding:7px 12px;
+  font-size:11px;
   font-weight:700;
   color:#999;
   background:#f8f8f8;
-  letter-spacing:1px;
+  letter-spacing:0.5px;
   border-bottom:1px solid #eee;
 }
 
@@ -1191,7 +1250,7 @@ body{
 
 <section id="transactions" class="page">
   <h2>Transaction History</h2>
-  <div class="card" style="overflow:auto;max-height:1024px;">
+  <div class="card transaction-wrapper" style="max-height:1024px;">
   <table id="transactionTable">
     <thead>
       <tr>
@@ -1942,18 +2001,30 @@ function loadTransactions(uid){
         let typeLabel = "UNKNOWN";
         let color = "#333";
 
-        if(t.type === "fund"){
-          typeLabel = "FUND";
-          color = "green";
-        }
-        else if(t.type === "purchase"){
-          typeLabel = "DEBIT";
-          color = "red";
-        }
-        else if(t.type === "bonus"){
-          typeLabel = "BONUS";
-          color = "blue";
-        }
+if(t.type === "fund"){
+  typeLabel = "FUND";
+  color = "green";
+}
+
+else if(t.type === "purchase"){
+  typeLabel = "VOUCHER";
+  color = "red";
+}
+
+else if(t.type === "airtime"){
+  typeLabel = "AIRTIME";
+  color = "orange";
+}
+
+else if(t.type === "data"){
+  typeLabel = "DATA";
+  color = "teal";
+}
+
+else if(t.type === "bonus"){
+  typeLabel = "BONUS";
+  color = "blue";
+}
 
         body.innerHTML += `
           <tr>
@@ -2372,6 +2443,24 @@ async function buyAirtime() {
 
     showAlert("✅ Airtime sent successfully");
 
+// SAVE TRANSACTION
+await db.collection("transactions").add({
+  userId: currentUser.uid,
+  email: currentUser.email,
+
+  type: "airtime",
+
+  plan: `${network} Airtime`,
+  amount: amount,
+
+  voucher: phone,
+
+  createdAt: new Date()
+});
+
+
+
+
     await getWallet();
 
   } catch (err) {
@@ -2428,6 +2517,21 @@ async function buyData(plan) {
     }
 
     showAlert("✅ Data purchased successfully");
+
+// SAVE TRANSACTION
+await db.collection("transactions").add({
+  userId: currentUser.uid,
+  email: currentUser.email,
+
+  type: "data",
+
+  plan: plan.data_plan,
+  amount: data.amount || 0,
+
+  voucher: phone,
+
+  createdAt: new Date()
+});
 
     await getWallet();
 
