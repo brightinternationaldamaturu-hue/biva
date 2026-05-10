@@ -1798,36 +1798,6 @@ function closeMenu() {
 
 
 
-function saveOmadaSession(user){
-  const params = new URLSearchParams(window.location.search);
-
-  const data = {
-    uid: user.uid,
-    email: user.email,
-    clientMac: params.get("clientMac"),
-    apMac: params.get("apMac"),
-    ssid: params.get("ssid"),
-    cliToken: params.get("cliToken"),
-    timestamp: new Date().toISOString()
-  };
-
-  db.collection("users")
-    .doc(user.uid)
-    .collection("omada_sessions")
-    .add(data)
-    .then(() => {
-      console.log("✅ Omada session saved");
-    })
-    .catch(err => {
-      console.error("❌ Error saving Omada session:", err);
-    });
-}
-
-
-
-
-
-
 function showAlert(message, type="success"){
   const alertBox = document.createElement("div");
 
@@ -2321,6 +2291,7 @@ function loadTransactions(uid){
       snapshot.forEach(doc => {
 
         const t = doc.data();
+        const id = doc.id;
 
         const date = t.createdAt?.toDate
           ? t.createdAt.toDate().toLocaleString()
@@ -2405,14 +2376,14 @@ body.innerHTML += `
 
     <td>
 
-      <button
-        class="btn"
-        style="padding:6px 10px;font-size:12px;"
-        onclick='viewTransaction(${JSON.stringify(t)})'>
+<button
+  class="btn"
+  style="padding:6px 10px;font-size:12px;"
+  onclick="viewTransaction('${id}')">
 
-        View
+  View
 
-      </button>
+</button>
 
     </td>
 
@@ -2447,6 +2418,41 @@ document.addEventListener("DOMContentLoaded", function () {
     buy(selectedPrice, selectedPlan);
   });
 });
+
+
+
+
+
+
+async function viewTransaction(id){
+
+  try{
+
+    const doc = await db.collection("transactions").doc(id).get();
+
+    if(!doc.exists){
+      showAlert("Transaction not found", "error");
+      return;
+    }
+
+    const t = doc.data();
+
+    printVoucher({
+      email: t.email || currentUser.email,
+      plan: t.plan || t.network || t.disco || "Transaction",
+      price: t.amount || t.price || 0,
+      voucher: t.voucher || t.reference || t.phone || t.meter || "N/A"
+    });
+
+  }catch(err){
+
+    console.error(err);
+    showAlert("Failed to load transaction", "error");
+
+  }
+}
+
+
 
 
 
