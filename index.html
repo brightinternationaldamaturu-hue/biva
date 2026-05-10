@@ -613,30 +613,6 @@ nav{
 
 
 
-/* MOBILE */
-@media (max-width:768px){
-
-  nav{
-    padding:10px 12px;
-  }
-
-  .menu-icon{
-    font-size:14px;
-    padding:8px 12px;
-  }
-
-  .nav-wallet{
-    font-size:14px;
-    padding:8px 12px;
-    min-width:auto;
-  }
-
-}
-
-
-
-
-
 
 
 .btn{
@@ -1181,33 +1157,60 @@ body{
   text-align:center;
 }
 
-/* MOBILE */
-@media(max-width:768px){
+/* =========================
+   MOBILE NAV FIX
+========================= */
 
-  .dashboard-grid{
-    grid-template-columns:repeat(3,1fr);
-    gap:14px;
+@media (max-width:768px){
+
+  nav{
+    height:60px;
+    padding:8px 12px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
   }
 
-  .service-card{
-    padding:18px 8px;
+  /* MENU LEFT */
+  .menu-container{
+    margin:0;
+    display:flex;
+    align-items:center;
+    justify-content:flex-start;
   }
 
-  .service-icon{
-    width:55px;
-    height:55px;
-    font-size:24px;
+  .menu-icon{
+    font-size:14px;
+    padding:8px 10px;
+    border-radius:10px;
+    white-space:nowrap;
   }
 
-  .service-card span{
-    font-size:12px;
+  /* WALLET RIGHT */
+  .right-nav{
+    margin-left:auto;
+    display:flex;
+    align-items:center;
+    justify-content:flex-end;
+  }
+
+  .nav-wallet{
+    font-size:13px;
+    padding:8px 12px;
+    border-radius:12px;
+    min-width:auto;
+    white-space:nowrap;
+  }
+
+  /* DROPDOWN */
+  .dropdown{
+    left:0;
+    right:auto;
+    width:240px;
   }
 
 }
-
-
-
-
 
 
 
@@ -1357,7 +1360,27 @@ body{
   <div class="dashboard-header">
     <h2>Welcome to BIVA</h2>
     <p>Premium Virtual Assistance & Internet Services</p>
-  </div>
+<div id="dashboardLoginBox" style="margin-top:15px;">
+
+  <button
+    class="btn"
+    onclick="openModal()"
+    style="
+      max-width:220px;
+      border-radius:14px;
+      font-size:15px;
+      padding:12px;
+    ">
+
+    🔐 Login / Signup
+
+  </button>
+</div>
+</div>
+
+
+
+
 
   <div class="dashboard-grid">
 
@@ -2000,6 +2023,33 @@ async function login(){
     hideLoader();
   }
 }
+
+
+
+
+auth.onAuthStateChanged(user => {
+
+  const loginBox = document.getElementById("dashboardLoginBox");
+
+  if(user){
+
+    // hide login button
+    if(loginBox){
+      loginBox.style.display = "none";
+    }
+
+  } else {
+
+    // show login button
+    if(loginBox){
+      loginBox.style.display = "block";
+    }
+
+  }
+
+});
+
+
 
 
 
