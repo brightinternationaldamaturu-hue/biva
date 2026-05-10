@@ -1536,18 +1536,15 @@ body{
 
     <table id="transactionTable">
 
-      <thead>
-        <tr>
-          <th>Type</th>
-          <th>Details</th>
-          <th>Amount</th>
-          <th>Reference</th>
-          <th>Date</th>
-          <th>Action</th>
-        </tr>
-      </thead>
+<thead>
+  <tr>
+    <th>Type</th>
+    <th>Amount</th>
+    <th>Action</th>
+  </tr>
+</thead>
 
-      <tbody id="transactionBody"></tbody>
+<tbody id="transactionBody"></tbody>
 
     </table>
 
@@ -2380,37 +2377,31 @@ function loadTransactions(uid){
           `;
         }
 
-        body.innerHTML += `
+body.innerHTML += `
 
-          <tr>
+  <tr>
 
-            <td>${badge}</td>
+    <td>${badge}</td>
 
-            <td>${details}</td>
+    <td>
+      ₦${Number(t.amount || t.price || 0).toLocaleString()}
+    </td>
 
-            <td>
-              ₦${t.amount || t.price || 0}
-            </td>
+    <td>
 
-            <td>${ref}</td>
+      <button
+        class="btn"
+        style="padding:6px 10px;font-size:12px;"
+        onclick='viewTransaction(${JSON.stringify(t)})'>
 
-            <td>${date}</td>
+        View
 
-            <td>
+      </button>
 
-              <button
-                class="btn"
-                style="padding:6px 10px;font-size:12px;"
-                onclick='printVoucher(${JSON.stringify(t)})'>
+    </td>
 
-                View
-
-              </button>
-
-            </td>
-
-          </tr>
-        `;
+  </tr>
+`;
       });
     });
 }
