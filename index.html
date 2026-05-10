@@ -216,11 +216,15 @@
 
 
 .menu-container{
-  position:relative;
   display:flex;
   align-items:center;
+
   justify-content:flex-start;
+
+  margin-right:auto;
   margin-left:0;
+
+  flex:1;
 }
 
 
@@ -228,7 +232,7 @@
   background:#fff5f5;
   color:#8B0000;
   padding:10px 14px;
-  border-radius:12px;
+  border-radius:25px;
   font-size:16px;
   font-weight:600;
   cursor:pointer;
@@ -568,12 +572,7 @@ nav{
   align-items:left;
 }
 
-/* WALLET RIGHT */
-.right-nav{
-  display:flex;
-  align-items:center;
-  margin-left:right;
-}
+
 
 /* WALLET CARD */
 .nav-wallet{
@@ -1167,36 +1166,14 @@ body{
     display:flex;
     justify-content:space-between;
     align-items:center;
-    gap:10px;
-    overflow:visible;
   }
 
   .menu-container{
-    position:relative;
-    flex:0 0 auto;
-    justify-content:flex-start;
-    align-items:center;
-  }
-
-  .right-nav{
-    margin-left:auto;
-    flex:0 0 auto;
-  }
-
-  .dropdown{
-    position:absolute;
-    top:48px;
-    left:0;
-    right:auto;
-
-    width:230px;
-    max-width:85vw;
-
-    z-index:99999;
+    justify-content:flex-start !important;
+    text-align:left;
   }
 
 }
-
 
 
 
