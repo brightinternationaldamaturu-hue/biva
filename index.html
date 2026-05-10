@@ -1161,53 +1161,38 @@ body{
    MOBILE NAV FIX
 ========================= */
 
-@media (max-width:768px){
+@media(max-width:768px){
 
   nav{
-    height:60px;
-    padding:8px 12px;
-
     display:flex;
-    align-items:center;
     justify-content:space-between;
-  }
-
-  /* MENU LEFT */
-  .menu-container{
-    margin:0;
-    display:flex;
     align-items:center;
+    gap:10px;
+    overflow:visible;
+  }
+
+  .menu-container{
+    position:relative;
+    flex:0 0 auto;
     justify-content:flex-start;
+    align-items:center;
   }
 
-  .menu-icon{
-    font-size:14px;
-    padding:8px 10px;
-    border-radius:10px;
-    white-space:nowrap;
-  }
-
-  /* WALLET RIGHT */
   .right-nav{
     margin-left:auto;
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
+    flex:0 0 auto;
   }
 
-  .nav-wallet{
-    font-size:13px;
-    padding:8px 12px;
-    border-radius:12px;
-    min-width:auto;
-    white-space:nowrap;
-  }
-
-  /* DROPDOWN */
   .dropdown{
+    position:absolute;
+    top:48px;
     left:0;
     right:auto;
-    width:240px;
+
+    width:230px;
+    max-width:85vw;
+
+    z-index:99999;
   }
 
 }
