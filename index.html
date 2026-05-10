@@ -2122,7 +2122,7 @@ async function signup(){
       createdAt: new Date()
     });
 
-    showAlert("✅ Account created successfully!");
+    showSuccessCard("Account Created Successfuly");
     closeModal();
 
   }catch(err){
@@ -2225,7 +2225,7 @@ async function fundWallet() {
           throw new Error(data.error || "Wallet funding failed");
         }
 
-        showAlert("✅ Wallet funded successfully");
+       showSuccessCard("Wallet funded successful");
 
         await getWallet();
 
@@ -2322,7 +2322,7 @@ async function logout(){
 
     // optional cleanup UI
     document.getElementById("userEmail").innerText = "";
-    showAlert("👋 Logged out successfully");
+    showSuccessCard("You Successfuly Logged Out");
 
   } catch (err) {
     showAlert("Error: " + err.message, "error");
@@ -3033,7 +3033,7 @@ async function confirmLogout(){
 
     document.getElementById("userEmail").innerText = "";
 
-    showAlert("👋 You have been logged out");
+    showSuccessCard("You Successfuly Logged Out");
 
   } catch (err) {
     showAlert(err.message, "error");
@@ -3170,14 +3170,33 @@ async function buyData(plan) {
       throw new Error("Server returned invalid response");
     }
 
-    if (!res.ok || !data.success) {
-      showAlert(data.error || "Purchase failed", "error");
-      return;
-    }
+if (!res.ok || !data.success) {
+  showAlert(data.error || "Purchase failed", "error");
+  return;
+}
 
-    showAlert("✅ Data purchased successfully");
+// SAVE DATA TRANSACTION
+await db.collection("transactions").add({
 
-    await getWallet();
+  userId: currentUser.uid,
+  email: currentUser.email,
+
+  type: "data",
+
+  network: plan.network_id,
+  plan: plan.data_plan,
+
+  amount: Number(plan.amount),
+
+  phone,
+
+  createdAt: new Date()
+
+});
+
+showSuccessCard("Data Purchase Successful");
+
+await getWallet();
 
   } catch (err) {
 
@@ -3272,11 +3291,12 @@ async function loadDataPlans(network) {
           <p>₦${plan.selling_price}</p>
 
           <button
-            class="btn"
-            onclick='buyData({
-              data_plan: "${plan.data_plan}",
-              network_id: "${network_id}"
-            })'>
+  class="btn"
+  onclick='buyData({
+    data_plan: "${plan.data_plan}",
+    network_id: "${network_id}",
+    amount: "${plan.selling_price}"
+  })'>
 
             Buy Now
 
