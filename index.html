@@ -565,8 +565,6 @@ nav{
   box-sizing:border-box;
 }
 
-
-
 /* MENU LEFT */
 .menu-container{
   display:flex;
@@ -1180,9 +1178,9 @@ body{
 
 .right-nav{
   display:flex;
-  align-items:center;
+  align-items:right;
 
-  margin-left:auto;
+  margin-left:right;
 }
 
   .dropdown{
@@ -1206,7 +1204,16 @@ body{
 </head>
 
 
+
 <nav>
+  <!-- RIGHT -->
+  <div class="menu-container">
+
+    <div class="nav-wallet" onclick="showPage('User')">
+      ₦<span id="navWallet">0</span>
+    </div>
+</div>
+
 
   <!-- LEFT -->
   <div class="menu-container">
@@ -1214,14 +1221,6 @@ body{
     <span class="menu-icon" onclick="toggleMenu()">
       ☰ Menu
     </span>
-</div>
-
-
-  <!-- RIGHT -->
-<div class="right-nav">
-  <div class="nav-wallet">
-    ₦<span id="navWallet">0</span>
-  </div>
 </div>
 </nav>
 
