@@ -56,7 +56,7 @@
   border:2px solid teal;
   color:teal;
   font-weight:bold;
-  font-size:28px;
+  font-size:22px;
   padding:6px 14px;
   border-radius:20px;
   box-shadow:0 3px 10px rgba(0,0,0,0.1);
@@ -569,6 +569,40 @@ nav{
 
   display:flex;
   align-items:center;
+}
+
+
+
+/* =========================
+   TOP NAVBAR LAYOUT
+========================= */
+
+nav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:12px 15px;
+
+  background:#8b0000;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+
+  z-index:9999;
+  box-sizing:border-box;
+}
+
+
+
+
+/* MENU LEFT */
+.menu-container{
+  display:flex;
+  align-items:left;
 }
 
 
@@ -1213,6 +1247,11 @@ body{
       ☰ Menu
     </span>
 </div>
+
+
+     <div id="walletCard" class="wallet-card">
+     ₦<span id="navWallet">0</span>
+     </div>
 </nav>
 
 <body>
@@ -1331,10 +1370,6 @@ body{
 
 <section id="dashboard" class="page active">
 
-    <div class="nav-wallet" onclick="showPage('User')">
-      ₦<span id="navWallet">0</span>
-    </div>
-    </div>
 
   <div class="dashboard-header">
     <h2>Welcome to BIVA</h2>
