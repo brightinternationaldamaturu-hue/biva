@@ -252,38 +252,19 @@
 .dropdown a{
   display:flex;
   align-items:center;
-  gap:8px;
-  padding:10px 14px;
+  gap:10px;
+  padding:14px 16px;
   text-decoration:none;
   color:#333;
   font-weight:500;
   transition:0.25s;
   border-bottom:1px solid #f4f4f4;
-  font-size:14px;
 }
 
 .dropdown a:hover{
   background:#fff5f5;
   color:#8B0000;
   padding-left:22px;
-}
-
-@media (max-width:768px){
-
-  .dropdown{
-    width:230px;
-    border-radius:14px;
-  }
-
-  .dropdown a{
-    padding:9px 12px;
-    font-size:13px;
-  }
-
-  .menu-icon{
-    padding:8px 12px;
-    font-size:14px;
-  }
 }
 
 
@@ -857,70 +838,30 @@ nav div {
 }
 
 
-/* =========================
-   TRANSACTION TABLE FIX
-========================= */
-
-.transaction-wrapper{
-  width:100%;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
-  border-radius:15px;
-}
-
-#transactionTable{
-  width:100%;
-  min-width:650px; /* prevents table crush */
-  border-collapse:collapse;
-  font-size:14px;
-  background:#fff;
+#transactionTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
 }
 
 #transactionTable th,
-#transactionTable td{
-  padding:12px 10px;
-  border-bottom:1px solid #eee;
-  text-align:left;
-  white-space:nowrap;
+#transactionTable td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+  text-align: left;
 }
 
-#transactionTable th{
-  background:#8B0000;
-  color:#fff;
-  position:sticky;
-  top:0;
-  z-index:2;
+#transactionTable th {
+  background: #8B0000;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 
-#transactionTable tr:hover{
-  background:#fff5f5;
+#transactionTable tr:hover {
+  background: #fff2f2;
 }
-
-/* MOBILE */
-@media (max-width:768px){
-
-  .transaction-wrapper{
-    border-radius:12px;
-  }
-
-  #transactionTable{
-    font-size:12px;
-    min-width:560px;
-  }
-
-  #transactionTable th,
-  #transactionTable td{
-    padding:8px 6px;
-  }
-
-  #transactionTable td button{
-    padding:6px 8px !important;
-    font-size:11px !important;
-  }
-}
-
-
-
 
 @media (max-width: 768px) {
   #transactionTable {
@@ -1022,12 +963,12 @@ body{
 /* MENU SECTION TITLES */
 
 .menu-title{
-  padding:7px 12px;
-  font-size:11px;
+  padding:10px 14px;
+  font-size:12px;
   font-weight:700;
   color:#999;
   background:#f8f8f8;
-  letter-spacing:0.5px;
+  letter-spacing:1px;
   border-bottom:1px solid #eee;
 }
 
@@ -1250,7 +1191,7 @@ body{
 
 <section id="transactions" class="page">
   <h2>Transaction History</h2>
-  <div class="card transaction-wrapper" style="max-height:1024px;">
+  <div class="card" style="overflow:auto;max-height:1024px;">
   <table id="transactionTable">
     <thead>
       <tr>
@@ -2001,30 +1942,18 @@ function loadTransactions(uid){
         let typeLabel = "UNKNOWN";
         let color = "#333";
 
-if(t.type === "fund"){
-  typeLabel = "FUND";
-  color = "green";
-}
-
-else if(t.type === "purchase"){
-  typeLabel = "VOUCHER";
-  color = "red";
-}
-
-else if(t.type === "airtime"){
-  typeLabel = "AIRTIME";
-  color = "orange";
-}
-
-else if(t.type === "data"){
-  typeLabel = "DATA";
-  color = "teal";
-}
-
-else if(t.type === "bonus"){
-  typeLabel = "BONUS";
-  color = "blue";
-}
+        if(t.type === "fund"){
+          typeLabel = "FUND";
+          color = "green";
+        }
+        else if(t.type === "purchase"){
+          typeLabel = "DEBIT";
+          color = "red";
+        }
+        else if(t.type === "bonus"){
+          typeLabel = "BONUS";
+          color = "blue";
+        }
 
         body.innerHTML += `
           <tr>
@@ -2443,24 +2372,6 @@ async function buyAirtime() {
 
     showAlert("✅ Airtime sent successfully");
 
-// SAVE TRANSACTION
-await db.collection("transactions").add({
-  userId: currentUser.uid,
-  email: currentUser.email,
-
-  type: "airtime",
-
-  plan: `${network} Airtime`,
-  amount: amount,
-
-  voucher: phone,
-
-  createdAt: new Date()
-});
-
-
-
-
     await getWallet();
 
   } catch (err) {
@@ -2518,21 +2429,6 @@ async function buyData(plan) {
 
     showAlert("✅ Data purchased successfully");
 
-// SAVE TRANSACTION
-await db.collection("transactions").add({
-  userId: currentUser.uid,
-  email: currentUser.email,
-
-  type: "data",
-
-  plan: plan.data_plan,
-  amount: data.amount || 0,
-
-  voucher: phone,
-
-  createdAt: new Date()
-});
-
     await getWallet();
 
   } catch (err) {
@@ -2581,24 +2477,31 @@ async function loadDataPlans(network) {
       airtel: 4
     };
 
-    const network_id =
-      networkMap[network.toLowerCase()];
+    const network_id = networkMap[network.toLowerCase()];
 
     const res = await fetch(
-      `/api/data/plans/${network_id}`
+      `https://biva-backend-ezvu.onrender.com/api/data/plans/${network_id}`
     );
 
-    const data = await res.json();
+    // READ AS TEXT FIRST
+    const text = await res.text();
+
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Invalid JSON:", text);
+      throw new Error("Server returned invalid response");
+    }
 
     console.log("PLANS RESPONSE:", data);
 
-    if (!data.success) {
-
+    if (!res.ok || !data.success) {
       showAlert(
-        "Failed to load plans",
+        data.error || "Failed to load plans",
         "error"
       );
-
       return;
     }
 
@@ -2607,44 +2510,40 @@ async function loadDataPlans(network) {
 
     plansDiv.innerHTML = "";
 
-    /**
-     * IMPORTANT FIX:
-     * data.data is already the array
-     */
     const plans = data.data || [];
 
-plans.forEach(plan => {
+    plans.forEach(plan => {
 
-  plansDiv.innerHTML += `
-    <div class="card">
+      plansDiv.innerHTML += `
+        <div class="card">
 
-      <h3>${plan.name || plan.data_plan}</h3>
+          <h3>${plan.name || plan.data_plan}</h3>
 
-      <p>${plan.validity || ""}</p>
+          <p>${plan.validity || ""}</p>
 
-      <p>₦${plan.selling_price}</p>
+          <p>₦${plan.selling_price}</p>
 
-      <button
-        class="btn"
-        onclick='buyData({
-          data_plan: "${plan.data_plan}",
-          network_id: "${network_id}"
-        })'>
+          <button
+            class="btn"
+            onclick='buyData({
+              data_plan: "${plan.data_plan}",
+              network_id: "${network_id}"
+            })'>
 
-        Buy Now
+            Buy Now
 
-      </button>
+          </button>
 
-    </div>
-  `;
-});
+        </div>
+      `;
+    });
 
   } catch (err) {
 
     console.error(err);
 
     showAlert(
-      "Error loading plans",
+      err.message || "Error loading plans",
       "error"
     );
 
