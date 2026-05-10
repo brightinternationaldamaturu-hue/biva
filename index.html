@@ -156,6 +156,8 @@
   padding: 8px 10px 6px;
   position: relative;
   overflow: hidden;
+  margin-top: 80px;
+  padding-top: 20px;
 }
 
 /* subtle glow effect */
@@ -213,9 +215,14 @@
 
 
 
-.menu-container {
-  position: relative;
+.menu-container{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  margin-left:0;
 }
+
 
 .menu-icon{
   background:#fff5f5;
@@ -471,22 +478,7 @@ html, body {
   overflow-x: hidden;
 }
 
-/* NAV FIX */
-nav {
-  flex-wrap: wrap;
-  gap: 5px;
-}
 
-nav div {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.right-nav {
-  flex-wrap: wrap;
-  justify-content: flex-start;
-}
 
 /* MAKE BUTTONS STACK BETTER */
 .btn {
@@ -544,99 +536,101 @@ nav div {
 }
 
 
-.wallet-float {
-  position: fixed;
-  top: 100px; /* adjust if needed */
-  right: 15px; /* move to right */
-  
-  background: Teal;
-  color: #fff;
 
-  padding: 8px 14px; /* auto size */
-  border-radius: 30px; /* pill shape */
 
-  font-weight: bold;
-  font-size: 22px;
 
-  display: inline-block;
-  width: auto; /* 🔥 IMPORTANT */
-  max-width: auto; /* prevent too long stretch */
+/* =========================
+   TOP NAVBAR LAYOUT
+========================= */
 
-  text-align: center;
+nav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
 
-  z-index: 9998;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 
-  transition: all 0.3s ease;
+  padding:12px 15px;
+
+  background:#fff;
+  box-shadow:0 2px 10px rgba(0,0,0,0.08);
+
+  z-index:9999;
+  box-sizing:border-box;
 }
 
-
-body {
-  padding-top: 160px;
+/* MENU LEFT */
+.menu-container{
+  display:flex;
+  align-items:center;
 }
 
-.wallet-float{
-  transition: all 0.3s ease;
+/* WALLET RIGHT */
+.right-nav{
+  display:flex;
+  align-items:center;
+  margin-left:auto;
 }
 
-.wallet-float:active{
-  transform: scale(1.05);
+/* WALLET CARD */
+.nav-wallet{
+  background:#8B0000;
+  color:#fff;
+  padding:8px 14px;
+  border-radius:30px;
+  font-weight:600;
+  font-size:14px;
+  cursor:pointer;
+  white-space:nowrap;
 }
 
-.wallet-float:hover {
-  background: #b30000;
+/* MENU ICON */
+.menu-icon{
+  font-size:16px;
+  font-weight:600;
+  cursor:pointer;
+  color:#111;
 }
 
+/* MOBILE */
+@media(max-width:768px){
 
-
-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 15px;
-  z-index: 9999;
-  flex-wrap: wrap;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-}
-
-nav div {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.right-nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-
-
-
-
-@media (max-width: 768px) {
-  nav {
-    flex-direction: column;
-    align-items: flex-start;
+  nav{
+    padding:10px 12px;
   }
 
-  nav div,
-  .Right-nav {
-    width: 100%;
-    justify-content: flex-start;
+  .nav-wallet{
+    font-size:13px;
+    padding:7px 12px;
   }
 
-  nav a {
-    display: inline-block;
-    margin: 5px 5px 0 0;
+}
+
+
+
+
+
+/* MOBILE */
+@media (max-width:768px){
+
+  nav{
+    padding:10px 12px;
   }
+
+  .menu-icon{
+    font-size:14px;
+    padding:8px 12px;
+  }
+
+  .nav-wallet{
+    font-size:14px;
+    padding:8px 12px;
+    min-width:auto;
+  }
+
 }
 
 
@@ -838,35 +832,91 @@ nav div {
 }
 
 
-#transactionTable {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
+/* =========================
+   TRANSACTION TABLE
+========================= */
+
+.transaction-wrapper{
+  width:100%;
+  overflow-x:auto;
+  -webkit-overflow-scrolling:touch;
+  border-radius:16px;
 }
 
-#transactionTable th,
-#transactionTable td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
-  text-align: left;
+#transactionTable{
+  width:100%;
+  min-width:750px;
+  border-collapse:collapse;
+  background:#fff;
 }
 
-#transactionTable th {
-  background: #8B0000;
-  color: #fff;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+#transactionTable th{
+  background:#8B0000;
+  color:#fff;
+  padding:14px;
+  font-size:14px;
+  text-align:left;
+  position:sticky;
+  top:0;
 }
 
-#transactionTable tr:hover {
-  background: #fff2f2;
+#transactionTable td{
+  padding:14px;
+  border-bottom:1px solid #eee;
+  font-size:14px;
+  vertical-align:top;
 }
 
-@media (max-width: 768px) {
-  #transactionTable {
-    font-size: 12px;
+#transactionTable tr:hover{
+  background:#fafafa;
+}
+
+.tx-badge{
+  padding:5px 10px;
+  border-radius:30px;
+  font-size:12px;
+  font-weight:700;
+  display:inline-block;
+}
+
+.tx-fund{
+  background:#d4edda;
+  color:#155724;
+}
+
+.tx-debit{
+  background:#f8d7da;
+  color:#721c24;
+}
+
+.tx-data{
+  background:#d1ecf1;
+  color:#0c5460;
+}
+
+.tx-airtime{
+  background:#fff3cd;
+  color:#856404;
+}
+
+.tx-bill{
+  background:#e2d9f3;
+  color:#4b0082;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  #transactionTable{
+    min-width:900px;
   }
+
+  #transactionTable th,
+  #transactionTable td{
+    padding:10px;
+    font-size:13px;
+  }
+
 }
 
 
@@ -1052,16 +1102,156 @@ body{
 }
 
 
-  </style>
+
+
+.nav-wallet{
+  background:linear-gradient(135deg,#008080,#006666);
+  color:#fff;
+  padding:10px 16px;
+  border-radius:14px;
+  font-weight:700;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-width:100px;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.12);
+  transition:0.3s;
+}
+
+.nav-wallet:hover{
+  transform:translateY(-2px);
+  opacity:0.95;
+}
+
+
+
+
+/* =========================
+   MODERN DASHBOARD
+========================= */
+
+#dashboard{
+  padding-top:110px;
+}
+
+.dashboard-header{
+  margin-bottom:25px;
+}
+
+.dashboard-header h2{
+  font-size:28px;
+  color:#8B0000;
+  margin-bottom:5px;
+  border:none;
+  padding:0;
+}
+
+.dashboard-header p{
+  color:#666;
+  font-size:14px;
+}
+
+/* GRID */
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(110px,1fr));
+  gap:16px;
+}
+
+/* CARD */
+.service-card{
+  background:#fff;
+  border-radius:22px;
+  padding:20px 12px;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+
+  cursor:pointer;
+
+  box-shadow:0 6px 20px rgba(0,0,0,0.06);
+
+  transition:0.25s ease;
+
+  border:1px solid #f3f3f3;
+}
+
+.service-card:hover{
+  transform:translateY(-4px);
+  box-shadow:0 10px 25px rgba(0,0,0,0.12);
+}
+
+/* ICON */
+.service-icon{
+  width:60px;
+  height:60px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:18px;
+
+  background:linear-gradient(135deg,#ff1a1a,#8B0000);
+
+  color:#fff;
+
+  font-size:28px;
+
+  margin-bottom:12px;
+
+  box-shadow:0 6px 15px rgba(255,26,26,0.25);
+}
+
+/* TEXT */
+.service-card span{
+  font-size:14px;
+  font-weight:600;
+  color:#333;
+  text-align:center;
+}
+
+/* MOBILE */
+@media(max-width:768px){
+
+  .dashboard-grid{
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+  }
+
+  .service-card{
+    padding:18px 8px;
+  }
+
+  .service-icon{
+    width:55px;
+    height:55px;
+    font-size:24px;
+  }
+
+  .service-card span{
+    font-size:12px;
+  }
+
+}
+
+
+
+
+
+
+
+
+</style>
 </head>
 
 
 
 <body>
-
-<div id="walletFloat" class="wallet-float" onclick="scrollToWallet()">
-  ₦0
-</div>
 
 
 
@@ -1070,15 +1260,24 @@ body{
 
 <nav>
 
-<div class="menu-container">
-  <span class="menu-icon" onclick="toggleMenu()">☰ Menu</span>
+  <!-- LEFT -->
+  <div class="menu-container">
 
-<div id="dropdownMenu" class="dropdown">
+    <span class="menu-icon" onclick="toggleMenu()">
+      ☰ Menu
+    </span>
+
+    <div id="dropdownMenu" class="dropdown">
+
+
+
+
+
 
   <!-- MAIN -->
   <div class="menu-title">MAIN</div>
 
-  <a href="#" onclick="showPage('about'); closeMenu()">
+  <a href="#" onclick="showPage('dashboard'); closeMenu()">
     🏠 Home
   </a>
 
@@ -1086,42 +1285,28 @@ body{
     👤 Profile
   </a>
 
-  <a href="#" onclick="showPage('transactions'); closeMenu()">
-    📜 Transactions
-  </a>
+<!-- ACCOUNT -->
+<div class="menu-title">ACCOUNT</div>
 
+<a href="#" onclick="fundWallet(); closeMenu()">
+  💰 Fund Wallet
+</a>
 
-  <!-- SERVICES -->
-  <div class="menu-title">SERVICES</div>
+<a href="#" id="activateBtn"
+   onclick="openBalance(); closeMenu()">
+   ⚡ Activate Voucher
+</a>
 
-  <a href="#" onclick="showPage('voucher'); closeMenu()">
-    📶 WiFi Voucher
-  </a>
+<a href="#" id="menuLoginBtn"
+   onclick="openModal(); closeMenu()">
+   🔐 Login
+</a>
 
-  <a href="#" onclick="showPage('data'); closeMenu()">
-    📡 Buy Data
-  </a>
-
-  <a href="#" onclick="showPage('airtime'); closeMenu()">
-    📱 Buy Airtime
-  </a>
-
-  <a href="#" onclick="showPage('bills'); closeMenu()">
-    💡 Pay Bills
-  </a>
-
-
-  <!-- ACCOUNT -->
-  <div class="menu-title">ACCOUNT</div>
-
-  <a href="#" onclick="fundWallet(); closeMenu()">
-    💰 Fund Wallet
-  </a>
-
-  <a href="#" id="activateBtn"
-     onclick="openBalance(); closeMenu()">
-     ⚡ Activate Voucher
-  </a>
+<a href="#" id="menuLogoutBtn"
+   onclick="openLogoutBox(); closeMenu()"
+   style="display:none;">
+   🚪 Logout
+</a>
 
 
   <!-- SUPPORT -->
@@ -1146,20 +1331,14 @@ body{
 </div>
 </div>
 
+  <!-- RIGHT -->
+  <div class="right-nav">
 
+    <div class="nav-wallet" onclick="showPage('User')">
+      ₦<span id="navWallet">0</span>
+    </div>
 
-
-<div class="right-nav">
-
-
-
-
-
-
-</a>
-    <button class="btn" id="loginBtn" onclick="openModal()">Login</button>
-</div>
-
+  </div>
 
 
 </nav>
@@ -1205,7 +1384,88 @@ body{
 
 
 
-<section id="about" class="page active">
+
+
+<section id="dashboard" class="page active">
+
+  <div class="dashboard-header">
+    <h2>Welcome to BIVA</h2>
+    <p>Premium Virtual Assistance & Internet Services</p>
+  </div>
+
+  <div class="dashboard-grid">
+
+    <div class="service-card" onclick="showPage('voucher')">
+      <div class="service-icon">🛜</div>
+      <span>Voucher</span>
+    </div>
+
+    <div class="service-card" onclick="showPage('data')">
+      <div class="service-icon">🌐</div>
+      <span>Buy Data</span>
+    </div>
+
+    <div class="service-card" onclick="showPage('airtime')">
+      <div class="service-icon">📞</div>
+      <span>Airtime</span>
+    </div>
+
+    <div class="service-card" onclick="showPage('bills')">
+      <div class="service-icon">💡</div>
+      <span>Pay Bills</span>
+    </div>
+
+    <div class="service-card" onclick="showPage('transactions')">
+      <div class="service-icon">📜</div>
+      <span>Transactions</span>
+    </div>
+
+    <div class="service-card" onclick="showPage('User')">
+      <div class="service-icon">👤</div>
+      <span>Profile</span>
+    </div>
+
+    <div class="service-card" onclick="fundWallet()">
+      <div class="service-icon">💰</div>
+      <span>Fund Wallet</span>
+    </div>
+
+    <div class="service-card" onclick="openBalance()">
+      <div class="service-icon">⚡</div>
+      <span>Activate</span>
+    </div>
+
+    <div class="service-card" onclick="showPage('services')">
+      <div class="service-icon">🛠</div>
+      <span>Services</span>
+    </div>
+
+    <div class="service-card" onclick="showPage('partnership')">
+      <div class="service-icon">🤝</div>
+      <span>Partnership</span>
+    </div>
+
+    <div class="service-card" onclick="openChatBox()">
+      <div class="service-icon">💬</div>
+      <span>Support</span>
+    </div>
+
+    <div class="service-card" onclick="showPage('about')">
+      <div class="service-icon">🏠</div>
+      <span>About</span>
+    </div>
+
+  </div>
+
+</section>
+
+
+
+
+
+
+
+<section id="about" class="page">
 
   <h2>About Us</h2>
   <p><strong>Bright International Virtual Assistance (BIVA)</strong> is a fully registered digital service and internet solutions company committed to delivering reliable, affordable, and high-quality virtual assistance and internet services across Nigeria and beyond.</p>
@@ -1269,9 +1529,33 @@ body{
 </section>
 
 <section id="transactions" class="page">
+
   <h2>Transaction History</h2>
-  <div class="card" style="overflow:auto;max-height:1024px;">
-  <table id="transactionTable">
+
+  <div class="transaction-wrapper">
+
+    <table id="transactionTable">
+
+      <thead>
+        <tr>
+          <th>Type</th>
+          <th>Details</th>
+          <th>Amount</th>
+          <th>Reference</th>
+          <th>Date</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody id="transactionBody"></tbody>
+
+    </table>
+
+  </div>
+
+</section>
+
+
     <thead>
       <tr>
         <th>Plan</th>
@@ -1316,12 +1600,6 @@ body{
      <div id="walletCard" class="wallet-card">
      <span id="wallet">0</span>
      </div>
-
-
-     <button class="btn" id="logoutBtn" onclick="openLogoutBox()" style="display:none">Logout</button>
-
-
-
 </section>
 
 
@@ -1469,30 +1747,67 @@ function hideLoader() {
 
 
 function showPage(pageId) {
+
   // hide all pages
-  document.querySelectorAll('.page').forEach(p => {
-    p.classList.remove('active');
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
   });
 
   // show selected page
-  document.getElementById(pageId).classList.add('active');
+  const selectedPage = document.getElementById(pageId);
 
-  // ✅ CONTROL HEADER VISIBILITY
+  if (selectedPage) {
+    selectedPage.classList.add("active");
+  }
+
+  // HEADER CONTROL
   const header = document.getElementById("mainHeader");
 
+  // only show header on About page
   if (pageId === "about") {
     header.style.display = "block";
   } else {
     header.style.display = "none";
   }
 
-  // close menu
+  // close dropdown menu
   closeMenu();
 
-  // scroll to top
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  // smooth scroll to top
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
+
 }
 
+
+
+
+window.addEventListener("DOMContentLoaded", () => {
+
+  // hide all pages first
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
+  });
+
+  // show dashboard only
+  document.getElementById("dashboard").classList.add("active");
+
+  // hide header on refresh
+  document.getElementById("mainHeader").style.display = "none";
+
+  // close menu if open
+  const menu = document.getElementById("dropdownMenu");
+
+  if(menu){
+    menu.style.display = "none";
+  }
+
+  // reset scroll
+  window.scrollTo(0, 0);
+
+});
 
 
 
@@ -1537,20 +1852,6 @@ function saveOmadaSession(user){
 
 
 
-
-
-
-
-
-
-
-let walletFloat = null;
-
-window.addEventListener("DOMContentLoaded", () => {
-  walletFloat = document.getElementById('walletFloat');
-});
-
-if (walletFloat) walletFloat.innerText = '₦' + balance;
 
 
 function showAlert(message, type="success"){
@@ -1779,8 +2080,8 @@ async function getWallet() {
   const res = await fetch(`/api/wallet/${currentUser.uid}`);
   const data = await res.json();
 
-  document.getElementById("wallet").innerText = "₦" + data.wallet;
-  walletFloat.innerText = "₦" + data.wallet;
+document.getElementById("wallet").innerText = "₦" + data.wallet;
+document.getElementById("navWallet").innerText = data.wallet;
 }
 
 // AUTH LISTENER
@@ -1792,8 +2093,8 @@ auth.onAuthStateChanged(user => {
   }
 
   if (user) {
-    loginBtn.style.display = 'none';
-    logoutBtn.style.display = 'block';
+document.getElementById("menuLoginBtn").style.display = "none";
+document.getElementById("menuLogoutBtn").style.display = "flex";
     document.getElementById("userEmail").innerText = user.email;
 
     loadTransactions(user.uid);
@@ -1817,14 +2118,14 @@ if (doc.exists && doc.data().blocked === true) {
 
 
         wallet.innerText = '₦' + balance;
-        walletFloat.innerText = '₦' + balance;
+        document.getElementById("navWallet").innerText = balance;
 
         voucherEl.innerText = doc.data().lastVoucher
           ? "Last Purchased Voucher: " + doc.data().lastVoucher
           : "";
       } else {
         wallet.innerText = '₦0';
-        walletFloat.innerText = '₦0';
+        document.getElementById("navWallet").innerText = "0";
         document.getElementById("userEmail").innerText = "";
       }
     });
@@ -1832,10 +2133,10 @@ if (doc.exists && doc.data().blocked === true) {
   } else {
     currentUser = null;
     wallet.innerText = '₦0';
-    walletFloat.innerText = '₦0';
+    document.getElementById("navWallet").innerText = "0";
 
-    loginBtn.style.display = 'block';
-    logoutBtn.style.display = 'none';
+document.getElementById("menuLoginBtn").style.display = "flex";
+document.getElementById("menuLogoutBtn").style.display = "none";
 
     document.getElementById("userEmail").innerText = "";
     document.getElementById("transactionBody").innerHTML = "";
@@ -1992,82 +2293,140 @@ await db.collection("vouchers").doc(voucher).set({
 
 
 function loadTransactions(uid){
+
   const body = document.getElementById("transactionBody");
 
   db.collection("transactions")
     .where("userId", "==", uid)
     .orderBy("createdAt", "desc")
+
     .onSnapshot(snapshot => {
 
       body.innerHTML = "";
 
       if(snapshot.empty){
+
         body.innerHTML = `
           <tr>
-            <td colspan="5" style="text-align:center;">No transaction history yet</td>
+            <td colspan="6" style="text-align:center;">
+              No transaction history yet
+            </td>
           </tr>
         `;
+
         return;
       }
 
       snapshot.forEach(doc => {
+
         const t = doc.data();
 
         const date = t.createdAt?.toDate
           ? t.createdAt.toDate().toLocaleString()
           : "Just now";
 
-        // Default styling
-        let typeLabel = "UNKNOWN";
-        let color = "#333";
+        let badge = "";
+        let details = "";
+        let ref = t.voucher || t.reference || "—";
 
+        // =========================
+        // FUND WALLET
+        // =========================
         if(t.type === "fund"){
-          typeLabel = "FUND";
-          color = "green";
+
+          badge = `<span class="tx-badge tx-fund">FUND</span>`;
+
+          details = `
+            Wallet Funding
+          `;
         }
+
+        // =========================
+        // WIFI VOUCHER
+        // =========================
         else if(t.type === "purchase"){
-          typeLabel = "DEBIT";
-          color = "red";
+
+          badge = `<span class="tx-badge tx-debit">VOUCHER</span>`;
+
+          details = `
+            ${t.plan || "-"}
+          `;
         }
-        else if(t.type === "bonus"){
-          typeLabel = "BONUS";
-          color = "blue";
+
+        // =========================
+        // DATA
+        // =========================
+        else if(t.type === "data"){
+
+          badge = `<span class="tx-badge tx-data">DATA</span>`;
+
+          details = `
+            ${t.network || ""}<br>
+            ${t.plan || ""}
+          `;
+        }
+
+        // =========================
+        // AIRTIME
+        // =========================
+        else if(t.type === "airtime"){
+
+          badge = `<span class="tx-badge tx-airtime">AIRTIME</span>`;
+
+          details = `
+            ${t.network || ""}<br>
+            ${t.phone || ""}
+          `;
+        }
+
+        // =========================
+        // BILL PAYMENT
+        // =========================
+        else if(t.type === "bill"){
+
+          badge = `<span class="tx-badge tx-bill">BILL</span>`;
+
+          details = `
+            ${t.disco || ""}<br>
+            Meter: ${t.meter || ""}
+          `;
         }
 
         body.innerHTML += `
+
           <tr>
-            <td>
-              <span style="color:${color};font-weight:600;">
-                ${typeLabel}
-              </span>
-              <br>
-              ${t.plan || "-"}
-            </td>
+
+            <td>${badge}</td>
+
+            <td>${details}</td>
 
             <td>
               ₦${t.amount || t.price || 0}
-
-              ${t.bonus ? `<br><small style="color:green;font-weight:600;">+ ₦${t.bonus} bonus</small>` : ""}
-
-              ${t.total ? `<br><small style="color:#555;">Total: ₦${t.total}</small>` : ""}
             </td>
 
-            <td>${t.voucher || "—"}</td>
+            <td>${ref}</td>
 
             <td>${date}</td>
 
             <td>
-              <button class="btn" style="padding:5px 8px;font-size:12px;"
+
+              <button
+                class="btn"
+                style="padding:6px 10px;font-size:12px;"
                 onclick='printVoucher(${JSON.stringify(t)})'>
+
                 View
+
               </button>
+
             </td>
+
           </tr>
         `;
       });
-
     });
 }
+
 
 let selectedPlan = null;
 let selectedPrice = null;
@@ -2315,14 +2674,6 @@ async function sendSupportMessage(text){
 
 
 
-window.addEventListener("load", () => {
-  const nav = document.querySelector("nav");
-  const wallet = document.querySelector(".wallet-float");
-
-  const navHeight = nav.offsetHeight;
-
-  wallet.style.top = navHeight + "px";
-});
 
 
 
@@ -2450,6 +2801,21 @@ async function buyAirtime() {
     }
 
     showAlert("✅ Airtime sent successfully");
+await db.collection("transactions").add({
+
+  userId: currentUser.uid,
+  email: currentUser.email,
+
+  type: "airtime",
+
+  network,
+  phone,
+
+  amount,
+
+  createdAt: new Date()
+
+});
 
     await getWallet();
 
@@ -2507,6 +2873,24 @@ async function buyData(plan) {
     }
 
     showAlert("✅ Data purchased successfully");
+await db.collection("transactions").add({
+
+  userId: currentUser.uid,
+  email: currentUser.email,
+
+  type: "data",
+
+  network: document.getElementById("dataNetwork").value.toUpperCase(),
+
+  plan: plan.data_plan,
+
+  phone,
+
+  amount: data.amount || 0,
+
+  createdAt: new Date()
+
+});
 
     await getWallet();
 
@@ -2635,18 +3019,81 @@ async function loadDataPlans(network) {
 
 
 async function payBill(){
-  const meter = document.getElementById("meterNumber").value;
-  const disco = document.getElementById("disco").value;
-  const amount = document.getElementById("billAmount").value;
 
-  const res = await fetch("https://biva-backend-ezvu.onrender.com/pay-bill", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({meter, disco, amount})
-  });
+  try{
 
-  const data = await res.json();
-  alert(JSON.stringify(data));
+    showLoader("Processing Bill Payment...");
+
+    const meter = document.getElementById("meterNumber").value.trim();
+
+    const disco = document.getElementById("disco").value;
+
+    const amount = Number(
+      document.getElementById("billAmount").value
+    );
+
+    if(!currentUser){
+      showAlert("Please login first","error");
+      return;
+    }
+
+    const res = await fetch(
+      "https://biva-backend-ezvu.onrender.com/pay-bill",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+          meter,
+          disco,
+          amount,
+          email: currentUser.email
+        })
+      }
+    );
+
+    const data = await res.json();
+
+    if(!res.ok){
+      showAlert(data.error || "Payment failed","error");
+      return;
+    }
+
+    // SAVE TRANSACTION
+    await db.collection("transactions").add({
+
+      userId: currentUser.uid,
+      email: currentUser.email,
+
+      type: "bill",
+
+      disco,
+      meter,
+
+      amount,
+
+      reference: data.reference || "Electricity Payment",
+
+      createdAt: new Date()
+
+    });
+
+    showAlert("✅ Bill payment successful");
+
+    await getWallet();
+
+  }catch(err){
+
+    showAlert(err.message,"error");
+
+  }finally{
+
+    hideLoader();
+
+  }
 }
 
 
@@ -2719,8 +3166,6 @@ window.addEventListener(
   "DOMContentLoaded",
   loadVoucherPlans
 );
-
-
 
 
 </script>
@@ -2987,6 +3432,11 @@ window.addEventListener(
 
 <!-- MOBILE BOTTOM NAV -->
 <div class="bottom-nav">
+
+  <button onclick="showPage('dashboard')">
+    <span>🏠</span>
+    <small>Home</small>
+  </button>
 
   <button onclick="showPage('voucher')">
     <span>🛜</span>
