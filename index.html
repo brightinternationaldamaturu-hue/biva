@@ -2153,7 +2153,7 @@ function calculateBonus(amount){
 
 
 
-function fundWallet() {
+async function fundWallet() {
 
   if (!currentUser) {
     showAlert("Please login first", "error");
@@ -2167,7 +2167,6 @@ function fundWallet() {
     return;
   }
 
-  // clean input
   amount = Number(amount.toString().replace(/[^0-9]/g, ""));
 
   if (!amount || amount <= 0) {
@@ -2176,33 +2175,77 @@ function fundWallet() {
   }
 
   FlutterwaveCheckout({
+
     public_key: "FLWPUBK-28666bd71e66a7e62eff4c94a16b83fb-X",
+
     tx_ref: "BIVA_" + Date.now(),
+
     amount: amount,
+
     currency: "NGN",
 
     customer: {
       email: currentUser.email,
     },
 
-    callback: async function (response) {
+    callback: async function(response) {
 
-      await fetch("/api/payment/verify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          transaction_id: response.transaction_id,
-          userId: currentUser.uid
-        })
-      });
+      try {
 
-      showAlert("Payment processing completed");
-      await getWallet();
+        showLoader("Verifying Payment...");
+
+        const res = await fetch(
+          "https://biva-backend-ezvu.onrender.com/api/payment/verify",
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+              transaction_id: response.transaction_id,
+              userId: currentUser.uid
+            })
+          }
+        );
+
+        const text = await res.text();
+
+        let data;
+
+        try {
+          data = JSON.parse(text);
+        } catch(e) {
+          console.error(text);
+          throw new Error("Invalid server response");
+        }
+
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Wallet funding failed");
+        }
+
+        showAlert("✅ Wallet funded successfully");
+
+        await getWallet();
+
+      } catch(err) {
+
+        console.error(err);
+
+        showAlert(err.message, "error");
+
+      } finally {
+
+        hideLoader();
+
+      }
     }
   });
 }
+
+
+
 
 
 async function login(){
@@ -3100,45 +3143,39 @@ async function buyData(plan) {
       return;
     }
 
-    const res = await fetch("/api/data/buy", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        userId: currentUser.uid,
-        phone,
-        data_plan: plan.data_plan,
-        network_id: plan.network_id
-      })
-    });
+    const res = await fetch(
+      "https://biva-backend-ezvu.onrender.com/api/data/buy",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          userId: currentUser.uid,
+          phone,
+          data_plan: plan.data_plan,
+          network_id: plan.network_id
+        })
+      }
+    );
 
-    const data = await res.json();
+    const text = await res.text();
+
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      console.error("Invalid JSON:", text);
+      throw new Error("Server returned invalid response");
+    }
 
     if (!res.ok || !data.success) {
       showAlert(data.error || "Purchase failed", "error");
       return;
     }
 
-    showSuccessCard("Data Purchase Successful");
-await db.collection("transactions").add({
-
-  userId: currentUser.uid,
-  email: currentUser.email,
-
-  type: "data",
-
-  network: document.getElementById("dataNetwork").value.toUpperCase(),
-
-  plan: plan.data_plan,
-
-  phone,
-
-  amount: data.amount || 0,
-
-  createdAt: new Date()
-
-});
+    showAlert("✅ Data purchased successfully");
 
     await getWallet();
 
