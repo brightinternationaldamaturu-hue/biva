@@ -59,7 +59,6 @@
   font-size:22px;
   padding:6px 14px;
   border-radius:20px;
-  position: right;
   box-shadow:0 3px 10px rgba(0,0,0,0.1);
   transition:0.3s;
   width:auto;              /* auto size */
@@ -495,17 +494,19 @@ html, body {
 @media (max-width: 768px) {
 
   header h1 {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
   }
 
   nav {
-    flex-direction: column;
-    align-items: flex-start;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
   }
 
-  nav a {
-    display: inline-block;
-    margin: 5px 5px 0 0;
+
+  .right-nav {
+    width: auto;
+    justify-content: flex-end;
   }
 
   .grid {
@@ -527,11 +528,6 @@ html, body {
 
   .modal-content {
     width: 90%;
-  }
-
-  .right-nav {
-    width: 100%;
-    justify-content: space-between;
   }
 
   #walletBalance {
