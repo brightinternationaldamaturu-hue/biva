@@ -547,28 +547,28 @@ html, body {
 ========================= */
 
 nav{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
 
-  padding:12px 15px;
-
-  background:#fff;
-  box-shadow:0 2px 10px rgba(0,0,0,0.08);
-
-  z-index:9999;
-  box-sizing:border-box;
+  width:100%;
 }
 
-/* MENU LEFT */
 .menu-container{
+  position:relative;
+
   display:flex;
-  align-items:left;
+  align-items:center;
+  justify-content:flex-start;
+
+  margin-right:auto;
+}
+
+.right-nav{
+  margin-left:auto;
+
+  display:flex;
+  align-items:center;
 }
 
 
@@ -1331,6 +1331,11 @@ body{
 
 <section id="dashboard" class="page active">
 
+    <div class="nav-wallet" onclick="showPage('User')">
+      ₦<span id="navWallet">0</span>
+    </div>
+    </div>
+
   <div class="dashboard-header">
     <h2>Welcome to BIVA</h2>
     <p>Premium Virtual Assistance & Internet Services</p>
@@ -1353,17 +1358,13 @@ body{
 </div>
 
 
-  <div class="dashboard-grid">
-    <div class="nav-wallet" onclick="showPage('User')">
-      ₦<span id="navWallet">0</span>
-    </div>
-</div>
 
 
 
 
 
   <div class="dashboard-grid">
+
 
     <div class="service-card" onclick="showPage('voucher')">
       <div class="service-icon">🛜</div>
