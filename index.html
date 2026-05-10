@@ -838,83 +838,49 @@ nav{
 
 .transaction-wrapper{
   width:100%;
-  overflow-x:auto;
-  -webkit-overflow-scrolling:touch;
+  overflow:hidden;
   border-radius:16px;
 }
 
 #transactionTable{
   width:100%;
-  min-width:750px;
   border-collapse:collapse;
   background:#fff;
+  table-layout:fixed;
 }
 
 #transactionTable th{
   background:#8B0000;
   color:#fff;
-  padding:14px;
+  padding:12px;
   font-size:14px;
-  text-align:left;
-  position:sticky;
-  top:0;
+  text-align:center;
 }
 
 #transactionTable td{
-  padding:14px;
+  padding:12px;
   border-bottom:1px solid #eee;
   font-size:14px;
-  vertical-align:top;
+  text-align:center;
+  word-wrap:break-word;
 }
 
 #transactionTable tr:hover{
   background:#fafafa;
 }
 
-.tx-badge{
-  padding:5px 10px;
-  border-radius:30px;
-  font-size:12px;
-  font-weight:700;
-  display:inline-block;
-}
-
-.tx-fund{
-  background:#d4edda;
-  color:#155724;
-}
-
-.tx-debit{
-  background:#f8d7da;
-  color:#721c24;
-}
-
-.tx-data{
-  background:#d1ecf1;
-  color:#0c5460;
-}
-
-.tx-airtime{
-  background:#fff3cd;
-  color:#856404;
-}
-
-.tx-bill{
-  background:#e2d9f3;
-  color:#4b0082;
-}
-
 /* MOBILE */
 @media(max-width:768px){
 
-  #transactionTable{
-    min-width:900px;
-  }
-
   #transactionTable th,
   #transactionTable td{
-    padding:10px;
-    font-size:13px;
+    padding:10px 6px;
+    font-size:12px;
+  }
+
+  .btn{
+    font-size:11px !important;
+    padding:6px 8px !important;
   }
 
 }
