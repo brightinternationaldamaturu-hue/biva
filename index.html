@@ -218,13 +218,12 @@
 .menu-container{
   display:flex;
   align-items:center;
-
   justify-content:flex-start;
 
-  margin-right:auto;
   margin-left:0;
+  margin-right:0;
 
-  flex:1;
+  flex:none;
 }
 
 
@@ -565,6 +564,8 @@ nav{
   z-index:9999;
   box-sizing:border-box;
 }
+
+
 
 /* MENU LEFT */
 .menu-container{
@@ -1179,9 +1180,9 @@ body{
 
 .right-nav{
   display:flex;
-  align-items:right;
+  align-items:center;
 
-  margin-left:right;
+  margin-left:auto;
 }
 
   .dropdown{
@@ -1217,11 +1218,10 @@ body{
 
 
   <!-- RIGHT -->
-  <div class="right-nav">
-
-    <div class="nav-wallet" onclick="showPage('User')">
-      ₦<span id="navWallet">0</span>
-    </div>
+<div class="right-nav">
+  <div class="nav-wallet">
+    ₦<span id="navWallet">0</span>
+  </div>
 </div>
 </nav>
 
