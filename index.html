@@ -150,14 +150,14 @@
 
 
 .main-header {
-  background: radial-gradient(circle at top, #ff1a1a, #8B0000);
+  background: radial-gradient(circle at top, green, teal);
   color: #fff;
   text-align: center;
-  padding: 8px 10px 6px;
+  padding: 4px 2px 3px;
   position: relative;
   overflow: hidden;
   margin-top: 80px;
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 /* subtle glow effect */
@@ -165,7 +165,7 @@
   content: "";
   position: absolute;
   width: 300px;
-  height: 100px;
+  height: 65px;
   background: rgba(255,255,255,0.1);
   border-radius: 50%;
   top: -100px;
@@ -396,7 +396,7 @@
     .btn:hover {background:green;}
 
     footer {
-      background:#8B0000;
+      background:green;
       color:#fff;
       text-align:center;
       padding:20px;
@@ -924,7 +924,7 @@ html, body {
   bottom:0;
   left:0;
   width:100%;
-  background:#00a86b;
+  background:white;
   display:flex;
   justify-content:space-around;
   align-items:center;
@@ -935,7 +935,7 @@ html, body {
 }
 
 .bottom-nav button{
-  background:none;
+  background:white;
   border:none;
   display:flex;
   flex-direction:column;
@@ -953,7 +953,7 @@ html, body {
 }
 
 .bottom-nav button:hover{
-  color:#00a86b;
+  color:white;
   transform:translateY(-2px);
 }
 
@@ -1004,12 +1004,12 @@ body{
   left:0;
   width:100%;
 
-  background:none;
+  background:white;
   display:flex;
   justify-content:space-around;
   align-items:center;
 
-  padding:5px 4px;
+  padding:10px 8px;
 
   box-shadow:0 -2px 15px rgba(0,0,0,0.15);
 
@@ -1024,20 +1024,17 @@ body{
 /* ICON CIRCLE */
 .bottom-nav button span{
   font-size:22px;
-
-  background:#fff; /* WHITE ICON BG */
-  color:green;   /* RED ICON */
-
-  width:45px;
+  background:green;   
+  color:green;    width:45px;
   height:45px;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  border-radius:35%;
+  border-radius:50%;
 
-  margin-bottom:5px;
+  margin-bottom:2px;
 
   box-shadow:0 4px 12px rgba(0,0,0,0.2);
 
@@ -1482,10 +1479,6 @@ body{
   <!-- MAIN -->
   <div class="menu-title">MAIN</div>
 
-  <a href="White" onclick="showPage('service-icon'); closeMenu()">
-    🏠 Home
-  </a>
-
   <a href="#" onclick="showPage('User'); closeMenu()">
     👤 Profile
   </a>
@@ -1529,8 +1522,9 @@ body{
 <a href="#" onclick="showPage('partnership'); closeMenu()">
   🤝 Partnership
 </a>
+
 <a href="#" onclick="showPage('services'); closeMenu()">
-  🛠 Services
+  🏗️ Services
 </a>
 
 </div>
