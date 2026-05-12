@@ -1637,6 +1637,123 @@ CLASSIC CONFIRM MODAL
 }
 
 
+
+/* =========================
+ERROR MODAL
+========================= */
+
+.error-modal{
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,.55);
+
+  backdrop-filter:blur(8px);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  z-index:999999999;
+
+  opacity:0;
+  visibility:hidden;
+
+  transition:.3s ease;
+}
+
+.error-modal.active{
+  opacity:1;
+  visibility:visible;
+}
+
+.error-box{
+
+  width:100%;
+  max-width:400px;
+
+  background:white;
+
+  border-radius:30px;
+
+  padding:35px 28px;
+
+  text-align:center;
+
+  transform:translateY(30px) scale(.95);
+
+  transition:.35s ease;
+
+  box-shadow:
+  0 25px 70px rgba(0,0,0,.18);
+}
+
+.error-modal.active .error-box{
+  transform:translateY(0) scale(1);
+}
+
+.error-icon{
+
+  width:90px;
+  height:90px;
+
+  margin:auto auto 20px;
+
+  border-radius:50%;
+
+  background:#fff1f1;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:42px;
+}
+
+.error-box h2{
+  font-size:28px;
+  font-weight:800;
+  color:#111827;
+  margin-bottom:14px;
+}
+
+.error-box p{
+  color:#666;
+  line-height:1.7;
+  font-size:15px;
+  margin-bottom:25px;
+}
+
+.error-btn{
+
+  border:none;
+
+  background:linear-gradient(
+    135deg,
+    #ff4d4f,
+    #ff2d2f
+  );
+
+  color:white;
+
+  padding:15px 28px;
+
+  border-radius:18px;
+
+  cursor:pointer;
+
+  font-weight:700;
+
+  font-size:15px;
+
+  transition:.3s;
+}
+
+.error-btn:hover{
+  transform:translateY(-2px);
+}
+
+
 </style>
 
 
@@ -2305,7 +2422,12 @@ async function signup(){
     closeModal();
 
   }catch(err){
-    showAlert(err.message, "error");
+    console.error(err);
+
+showErrorModal(
+  "Signup Failed",
+  "Please use differnt info or try again later."
+);
 
   }finally{
     hideLoader();
@@ -2334,24 +2456,41 @@ function calculateBonus(amount){
 
 async function fundWallet() {
 
-  if (!currentUser) {
-    showAlert("Please login first", "error");
-    return;
-  }
+if (!currentUser) {
 
-  let amount = prompt("Enter amount to fund (₦):");
+  showErrorModal(
+    "Please login first."
+  );
 
-  if (!amount) {
-    showAlert("Amount is required", "error");
-    return;
-  }
+  return;
+}
 
-  amount = Number(amount.toString().replace(/[^0-9]/g, ""));
+let amount = prompt(
+  "Enter amount to fund (₦):"
+);
 
-  if (!amount || amount <= 0) {
-    showAlert("Invalid amount", "error");
-    return;
-  }
+if (!amount) {
+
+  showErrorModal(
+    "Amount is required."
+  );
+
+  return;
+}
+
+amount = Number(
+  amount.toString()
+  .replace(/[^0-9]/g, "")
+);
+
+if (!amount || amount <= 0) {
+
+  showErrorModal(
+    "Please enter a valid amount."
+  );
+
+  return;
+}
 
   FlutterwaveCheckout({
 
@@ -2412,7 +2551,12 @@ async function fundWallet() {
 
         console.error(err);
 
-        showAlert(err.message, "error");
+        console.error(err);
+
+showErrorModal(
+  "Transaction Failed",
+  "Please try again later."
+);
 
       } finally {
 
@@ -2456,7 +2600,12 @@ async function login(){
     closeModal();
 
   }catch(err){
-    showAlert(err.message, "error");
+    console.error(err);
+
+showErrorModal(
+  "Login Failed",
+  "Please make sure your login details are correct before retrying."
+);
 
   }finally{
     hideLoader();
@@ -2549,11 +2698,21 @@ document.getElementById("menuLogoutBtn").style.display = "flex";
 const userRef = db.collection("users").doc(user.uid);
 
 userRef.get().then(doc => {
-if (doc.exists && doc.data().blocked === true) {
-  auth.signOut();
-  showAlert("❌ Your account has been blocked", "error");
-  return;
-}
+
+  if (
+    doc.exists &&
+    doc.data().blocked === true
+  ) {
+
+    auth.signOut();
+
+    showErrorModal(
+      "Your account has been blocked."
+    );
+
+    return;
+  }
+
 });
 
 
@@ -2589,10 +2748,14 @@ document.getElementById("menuLogoutBtn").style.display = "none";
 
 // BUY WITH WALLET
 async function buy(price, plan) {
-  if (!currentUser) {
-    showAlert("Login first");
-    return;
-  }
+if (!currentUser) {
+
+  showErrorModal(
+    "Please login first."
+  );
+
+  return;
+}
 
   const userId = currentUser.uid;
   const userRef = db.collection("users").doc(userId);
@@ -2738,11 +2901,17 @@ await db.collection("adminNotifications").add({
       voucher
     });
 
-  } catch (err) {
-    showAlert("❌ " + err.message, "error");
-    console.error(err);
+} catch (err) {
 
-  } finally {
+  // LOG REAL ERROR
+  console.error(err);
+
+  // SHOW CLEAN MODAL
+  showErrorModal(
+    "Something went wrong. Please try again later."
+  );
+
+} finally {
     // 🔓 STEP 7: ALWAYS release lock (critical)
     await lockRef.set({ locked: false });
                       showLoader("Processing Purchase", "Securing payment & generating voucher...");
@@ -2919,12 +3088,19 @@ async function viewTransaction(id){
 
   try{
 
-    const doc = await db.collection("transactions").doc(id).get();
+const doc = await db
+  .collection("transactions")
+  .doc(id)
+  .get();
 
-    if(!doc.exists){
-      showAlert("Transaction not found", "error");
-      return;
-    }
+if(!doc.exists){
+
+  showErrorModal(
+    "Transaction not found."
+  );
+
+  return;
+}
 
     const t = doc.data();
 
@@ -3078,10 +3254,14 @@ async function sendMessage(){
   const input = document.getElementById("chatInput");
   const text = input.value.trim();
 
-  if(!text || !currentUser){
-    showAlert("Login first to chat", "warning");
-    return;
-  }
+if(!text || !currentUser){
+
+  showErrorModal(
+    "Please login first to chat."
+  );
+
+  return;
+}
 
   const ref = db.collection("supportChats").doc(currentUser.uid);
 
@@ -3237,7 +3417,12 @@ async function confirmLogout(){
     showSuccessCard("You Successfuly Logged Out");
 
   } catch (err) {
-    showAlert(err.message, "error");
+    console.error(err);
+
+showErrorModal(
+  "Logout Failed",
+  "Please try again later."
+);
 
   } finally {
     hideLoader();
@@ -3515,18 +3700,19 @@ Proceed with transaction?`
     // REFRESH WALLET
     // ===============================
 
-    await getWallet();
+await getWallet();
 
-  } catch (err) {
+} catch (err) {
 
-    console.error(err);
+  // LOG REAL ERROR
+  console.error(err);
 
-    showAlert(
-      err.message,
-      "error"
-    );
+  // SHOW CLEAN MODAL
+  showErrorModal(
+    "Somthing went wrong"
+  );
 
-  } finally {
+} finally {
 
     // ===============================
     // RELEASE LOCK
@@ -3619,15 +3805,14 @@ async function buyData(plan) {
     // VALIDATION
     // ===============================
 
-    if (!currentUser) {
+if (!currentUser) {
 
-      showAlert(
-        "Please login first",
-        "error"
-      );
+  showErrorModal(
+    "Please login first."
+  );
 
-      return;
-    }
+  return;
+}
 
     const phone = document
       .getElementById("dataPhone")
@@ -3636,12 +3821,11 @@ async function buyData(plan) {
 
     if (!phone) {
 
-      showAlert(
-        "Enter phone number",
-        "error"
-      );
+showErrorModal(
+  "Please enter phone number."
+);
 
-      return;
+return;
     }
 
 // ===============================
@@ -3740,15 +3924,15 @@ if(!confirmBuy){
       !data.success
     ) {
 
-      showAlert(
+showErrorModal(
 
-        data.error ||
-        "Purchase failed",
+  data.error ||
 
-        "error"
-      );
+  "Transaction failed. Please try again later."
 
-      return;
+);
+
+return;
     }
 
     // ===============================
@@ -3829,13 +4013,11 @@ if(!confirmBuy){
   } catch (err) {
 
     console.error(err);
+showErrorModal(
+  "Transaction failed. Please try again later."
+);
 
-    showAlert(
-      err.message,
-      "error"
-    );
-
-  } finally {
+} finally {
 
     dataProcessing = false;
 
@@ -3897,13 +4079,18 @@ async function loadDataPlans(network) {
 
     console.log("PLANS RESPONSE:", data);
 
-    if (!res.ok || !data.success) {
-      showAlert(
-        data.error || "Failed to load plans",
-        "error"
-      );
-      return;
-    }
+if (!res.ok || !data.success) {
+
+  showErrorModal(
+
+    data.error ||
+
+    "Failed to load plans."
+
+  );
+
+  return;
+}
 
     const plansDiv =
       document.getElementById("dataPlans");
@@ -3941,14 +4128,15 @@ async function loadDataPlans(network) {
 
   } catch (err) {
 
-    console.error(err);
+console.error(err);
 
-    showAlert(
-      err.message || "Error loading plans",
-      "error"
-    );
+showErrorModal(
 
-  } finally {
+  "Error loading plans. Please try again later."
+
+);
+
+} finally {
 
     hideLoader();
   }
@@ -3984,15 +4172,14 @@ async function payBill(){
     // VALIDATION
     // ===============================
 
-    if(!currentUser){
+if(!currentUser){
 
-      showAlert(
-        "Please login first",
-        "error"
-      );
+  showErrorModal(
+    "Please login first."
+  );
 
-      return;
-    }
+  return;
+}
 
     const meter =
       document.getElementById(
@@ -4012,15 +4199,14 @@ async function payBill(){
 
     );
 
-    if(!meter || !disco || !amount){
+if(!meter || !disco || !amount){
 
-      showAlert(
-        "Fill all fields",
-        "error"
-      );
+  showErrorModal(
+    "Please fill all fields."
+  );
 
-      return;
-    }
+  return;
+}
 
 
 
@@ -4094,18 +4280,18 @@ if(!confirmPay){
     // CHECK RESPONSE
     // ===============================
 
-    if(!res.ok){
+if(!res.ok){
 
-      showAlert(
+  showErrorModal(
 
-        data.error ||
-        "Payment failed",
+    data.error ||
 
-        "error"
-      );
+    "Payment failed. Please try again later."
 
-      return;
-    }
+  );
+
+  return;
+}
 
     // ===============================
     // SAVE TRANSACTION
@@ -4180,16 +4366,20 @@ if(!confirmPay){
 
     await getWallet();
 
-  } catch(err){
+} catch(err){
 
-    console.error(err);
+  // LOG REAL ERROR
+  console.error(
+    "Bill Payment Error:",
+    err
+  );
 
-    showAlert(
-      err.message,
-      "error"
-    );
+  // SHOW CLEAN ERROR MODAL
+  showErrorModal(
+    "Transaction failed."
+  );
 
-  } finally{
+} finally{
 
     billProcessing = false;
 
@@ -4352,6 +4542,43 @@ function closeConfirmModal(result){
     confirmResolver = null;
   }
 }
+
+
+/* =========================
+ERROR MODAL SYSTEM
+========================= */
+
+function showErrorModal(
+
+  title = "Transaction Failed",
+
+  message =
+  "Please try again later."
+
+){
+
+  document.getElementById(
+    "errorTitle"
+  ).innerText = title;
+
+  document.getElementById(
+    "errorMessage"
+  ).innerText = message;
+
+  document.getElementById(
+    "errorModal"
+  ).classList.add("active");
+
+}
+
+function closeErrorModal(){
+
+  document.getElementById(
+    "errorModal"
+  ).classList.remove("active");
+
+}
+
 
 
 </script>
@@ -4693,6 +4920,45 @@ CLASSIC CONFIRM MODAL
   </div>
 
 </div>
+
+
+
+
+
+<!-- =========================
+ERROR MODAL
+========================= -->
+
+<div class="error-modal" id="errorModal">
+
+  <div class="error-box">
+
+    <div class="error-icon">
+      ❌
+    </div>
+
+    <h2 id="errorTitle">
+      Transaction Failed
+    </h2>
+
+    <p id="errorMessage">
+      Something went wrong.
+      Please try again later.
+    </p>
+
+    <button
+      class="error-btn"
+      onclick="closeErrorModal()">
+
+      Okay
+
+    </button>
+
+  </div>
+
+</div>
+
+
 
 
 
