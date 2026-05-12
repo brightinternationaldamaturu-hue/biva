@@ -2508,9 +2508,29 @@ await db.collection("vouchers").doc(voucher).set({
     await userRef.update({
       lastVoucher: voucher
     });
-                                                          showLoader("Finalizing", "Almost done...");
+ showLoader("Finalizing", "Almost done...");
+
     // 🎉 SUCCESS
     showAlert("✅ Purchase successful!");
+
+
+
+// 🔔 ADMIN NOTIFICATION
+await db.collection("adminNotifications").add({
+
+  title: "Voucher Purchase",
+
+  message:
+  `${currentUser.email} bought ${plan} voucher for ₦${Number(price).toLocaleString('en-NG')}`,
+
+  type: "voucher",
+
+  createdAt:
+  firebase.firestore.FieldValue.serverTimestamp()
+
+});
+
+
 	// ✅ Show Activate button
 	document.getElementById("activateBtn").style.display = "block";
 
@@ -3208,6 +3228,21 @@ async function buyAirtime() {
       "Airtime Purchase Successful"
     );
 
+// 🔔 SEND ADMIN NOTIFICATION
+await db.collection("adminNotifications").add({
+
+  title: "Airtime Purchase",
+
+  message:
+  `${currentUser.email} bought airtime worth ₦${Number(amount).toLocaleString('en-NG')}`,
+
+  type: "airtime",
+
+  createdAt:
+  firebase.firestore.FieldValue.serverTimestamp()
+
+});
+
     await getWallet();
 
   } catch (err) {
@@ -3344,6 +3379,23 @@ async function buyData(plan) {
     });
 
     showSuccessCard("Data Purchase Successful");
+
+
+// 🔔 ADMIN NOTIFICATION
+await db.collection("adminNotifications").add({
+
+  title: "Data Purchase",
+
+  message:
+  `${currentUser.email} bought ${plan.data_plan} data for ₦${Number(plan.amount).toLocaleString('en-NG')}`,
+
+  type: "data",
+
+  createdAt:
+  firebase.firestore.FieldValue.serverTimestamp()
+
+});
+
 
     await getWallet();
 
@@ -3538,6 +3590,25 @@ async function payBill(){
     });
 
     showSuccessCard("Bill Payment Successful");
+
+
+
+// 🔔 ADMIN NOTIFICATION
+await db.collection("adminNotifications").add({
+
+  title: "Bill Payment",
+
+  message:
+  `${currentUser.email} paid ₦${Number(amount).toLocaleString('en-NG')} for ${disco}`,
+
+  type: "bill",
+
+  createdAt:
+  firebase.firestore.FieldValue.serverTimestamp()
+
+});
+
+
 
     await getWallet();
 
