@@ -3696,23 +3696,20 @@ Proceed with transaction?`
 
     });
 
-    // ===============================
-    // REFRESH WALLET
-    // ===============================
 
 await getWallet();
 
 } catch (err) {
 
-  // LOG REAL ERROR
-  console.error(err);
+  
+// LOG REAL ERROR
+console.error(err);
 
-  // SHOW CLEAN MODAL
-  showErrorModal(
-    "Somthing went wrong"
-  );
+} 
 
-} finally {
+
+
+finally {
 
     // ===============================
     // RELEASE LOCK
@@ -4004,20 +4001,18 @@ return;
 
     });
 
-    // ===============================
-    // REFRESH WALLET
-    // ===============================
+// ===============================
+// REFRESH WALLET
+// ===============================
 
-    await getWallet();
+await getWallet();
+} 
 
-  } catch (err) {
+catch (err) {
+console.error(err);
+} 
 
-    console.error(err);
-showErrorModal(
-  "Transaction failed. Please try again later."
-);
-
-} finally {
+finally {
 
     dataProcessing = false;
 
