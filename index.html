@@ -3432,6 +3432,7 @@ showErrorModal(
 
 
 
+
 // ===============================
 // BUY AIRTIME WITH CONFIRMATION
 // ===============================
@@ -3454,6 +3455,8 @@ async function buyAirtime() {
     return;
   }
 
+  let requestId = null;
+
   try {
 
     // ===============================
@@ -3461,7 +3464,10 @@ async function buyAirtime() {
     // ===============================
 
     if (!currentUser) {
-      throw new Error("Please login first");
+
+      throw new Error(
+        "Please login first"
+      );
     }
 
     const phone =
@@ -3480,7 +3486,11 @@ async function buyAirtime() {
       ).value
     );
 
-    if (!phone || !network || !amount) {
+    if (
+      !phone ||
+      !network ||
+      !amount
+    ) {
 
       throw new Error(
         "Fill all fields"
@@ -3491,10 +3501,10 @@ async function buyAirtime() {
     // CONFIRM PURCHASE
     // ===============================
 
-const confirmBuy =
-await showConfirmModal(
+    const confirmBuy =
+      await showConfirmModal(
 
-  "Confirm Airtime Purchase",
+        "Confirm Airtime Purchase",
 
 `Network: ${network}
 
@@ -3504,7 +3514,7 @@ Amount: ₦${amount.toLocaleString('en-NG')}
 
 Proceed with transaction?`
 
-);
+      );
 
     if (!confirmBuy) {
       return;
@@ -3537,7 +3547,7 @@ Proceed with transaction?`
     // UNIQUE TRANSACTION ID
     // ===============================
 
-    const requestId =
+    requestId =
 
       "AIRTIME_" +
       currentUser.uid +
@@ -3554,7 +3564,10 @@ Proceed with transaction?`
 
     await lockRef.set({
 
-      createdAt: new Date()
+      createdAt:
+      firebase.firestore
+      .FieldValue
+      .serverTimestamp()
 
     });
 
@@ -3589,6 +3602,10 @@ Proceed with transaction?`
       }
     );
 
+    // ===============================
+    // PARSE RESPONSE
+    // ===============================
+
     const text =
       await res.text();
 
@@ -3600,7 +3617,10 @@ Proceed with transaction?`
 
     } catch (e) {
 
-      console.error(text);
+      console.error(
+        "Invalid JSON:",
+        text
+      );
 
       throw new Error(
         "Invalid server response"
@@ -3618,7 +3638,8 @@ Proceed with transaction?`
 
       throw new Error(
 
-        data.error ||
+        data.message ||
+
         "Airtime purchase failed"
 
       );
@@ -3653,10 +3674,18 @@ Proceed with transaction?`
         phone,
         amount,
 
-        status: "success",
+        status: "completed",
+
+        providerStatus:
+        data.status || "success",
+
+        response:
+        data,
 
         createdAt:
-        new Date()
+        firebase.firestore
+        .FieldValue
+        .serverTimestamp()
 
       });
     }
@@ -3682,7 +3711,7 @@ Proceed with transaction?`
 
       message:
 
-      `${currentUser.email} bought airtime worth ₦${Number(amount).toLocaleString('en-NG')}`,
+`${currentUser.email} bought airtime worth ₦${amount.toLocaleString('en-NG')}`,
 
       type: "airtime",
 
@@ -3696,18 +3725,32 @@ Proceed with transaction?`
 
     });
 
+    // ===============================
+    // REFRESH WALLET
+    // ===============================
 
-await getWallet();
+    await getWallet();
 
-} catch (err) {
+  } catch (err) {
 
-  
-// LOG REAL ERROR
-console.error(err);
+    // ===============================
+    // ERROR HANDLER
+    // ===============================
 
-} 
+    console.error(
+      "AIRTIME ERROR:",
+      err
+    );
 
+    showErrorModal(
 
+      err.message ||
+
+      "Transaction Failed"
+
+    );
+
+  } 
 
 finally {
 
@@ -3717,40 +3760,30 @@ finally {
 
     try {
 
-      const requestIdPrefix =
-
-        "AIRTIME_" +
-        currentUser?.uid;
-
-      const snapshot =
+      if (requestId) {
 
         await db
         .collection(
           "airtimeLocks"
         )
-        .where(
-          firebase.firestore
-          .FieldPath.documentId(),
+        .doc(requestId)
+        .delete();
 
-          ">=",
-
-          requestIdPrefix
-        )
-        .get();
-
-      snapshot.forEach(doc => {
-
-        doc.ref.delete();
-
-      });
+      }
 
     } catch (e) {
 
       console.error(
+
         "Failed to clear lock:",
         e
+
       );
     }
+
+    // ===============================
+    // RESET BUTTON
+    // ===============================
 
     airtimeProcessing = false;
 
@@ -3770,6 +3803,7 @@ finally {
     hideLoader();
   }
 }
+
 
 
 
@@ -3921,13 +3955,9 @@ if(!confirmBuy){
       !data.success
     ) {
 
-showErrorModal(
-
-  data.error ||
-
-  "Transaction failed. Please try again later."
-
-);
+  showErrorModal(
+    "Something went Wrong"
+  );
 
 return;
     }
