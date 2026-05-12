@@ -2525,6 +2525,8 @@ await db.collection("adminNotifications").add({
 
   type: "voucher",
 
+  read:false,
+
   createdAt:
   firebase.firestore.FieldValue.serverTimestamp()
 
@@ -3238,6 +3240,8 @@ await db.collection("adminNotifications").add({
 
   type: "airtime",
 
+  read:false,
+
   createdAt:
   firebase.firestore.FieldValue.serverTimestamp()
 
@@ -3390,6 +3394,8 @@ await db.collection("adminNotifications").add({
   `${currentUser.email} bought ${plan.data_plan} data for ₦${Number(plan.amount).toLocaleString('en-NG')}`,
 
   type: "data",
+
+  read:false,
 
   createdAt:
   firebase.firestore.FieldValue.serverTimestamp()
@@ -3602,6 +3608,10 @@ await db.collection("adminNotifications").add({
   `${currentUser.email} paid ₦${Number(amount).toLocaleString('en-NG')} for ${disco}`,
 
   type: "bill",
+
+
+  read:false,
+
 
   createdAt:
   firebase.firestore.FieldValue.serverTimestamp()
