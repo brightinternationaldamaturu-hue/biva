@@ -3029,13 +3029,32 @@ async function confirmLogout(){
 
 
 
+
+// 💵 BUY AIRTIME
+
+let airtimeProcessing = false;
+
 async function buyAirtime() {
+
+  // 🔒 BLOCK DOUBLE CLICK
+  if (airtimeProcessing) {
+    showAlert("Transaction already processing...", "warning");
+    return;
+  }
+
+  airtimeProcessing = true;
+
   try {
+
     showLoader("Processing Airtime...");
 
     const phone = document.getElementById("airtimePhone").value.trim();
+
     const network = document.getElementById("airtimeNetwork").value;
-    const amount = Number(document.getElementById("airtimeAmount").value);
+
+    const amount = Number(
+      document.getElementById("airtimeAmount").value
+    );
 
     if (!currentUser) {
       showAlert("Please login first", "error");
@@ -3047,60 +3066,114 @@ async function buyAirtime() {
       return;
     }
 
-    const res = await fetch("https://biva-backend-ezvu.onrender.com/api/buy-airtime", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        phone,
-        network,
-        amount,
-        email: currentUser.email
-      })
-    });
+    // ✅ UNIQUE TRANSACTION ID
+    const txId =
+      "AIRTIME_" +
+      currentUser.uid +
+      "_" +
+      Date.now();
 
-    // 🔥 SAFE JSON HANDLING (prevents <!DOCTYPE html> crash)
-    const text = await res.text();
+    // ✅ CHECK IF TRANSACTION EXISTS
+    const txRef = db.collection("transactions").doc(txId);
 
-    let data;
-    try {
-      data = JSON.parse(text);
-    } catch (e) {
-      throw new Error("Server error: Invalid JSON response");
-    }
+    const existing = await txRef.get();
 
-    if (!res.ok || !data.success) {
-      showAlert(data.error || "Airtime failed", "error");
+    if (existing.exists) {
+      showAlert("Duplicate transaction blocked", "warning");
       return;
     }
 
-    showSuccessCard("Airtime Purchase Successful");
-await db.collection("transactions").add({
+    // ✅ DISABLE BUTTON
+    const btn = document.getElementById("buyAirtimeBtn");
 
-  userId: currentUser.uid,
-  email: currentUser.email,
+    if (btn) btn.disabled = true;
 
-  type: "airtime",
+    // =========================
+    // CALL BACKEND
+    // =========================
 
-  network,
-  phone,
+    const res = await fetch(
+      "https://biva-backend-ezvu.onrender.com/api/buy-airtime",
+      {
+        method: "POST",
 
-  amount,
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-  createdAt: new Date()
+        body: JSON.stringify({
+          phone,
+          network,
+          amount,
+          email: currentUser.email,
+          txId
+        })
+      }
+    );
 
-});
+    const text = await res.text();
+
+    let data;
+
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      throw new Error("Invalid server response");
+    }
+
+    if (!res.ok || !data.success) {
+      throw new Error(
+        data.error || "Airtime purchase failed"
+      );
+    }
+
+    // =========================
+    // SAVE FIREBASE RECORD ONCE
+    // =========================
+
+    await txRef.set({
+
+      txId,
+
+      userId: currentUser.uid,
+
+      email: currentUser.email,
+
+      type: "airtime",
+
+      network,
+
+      phone,
+
+      amount,
+
+      createdAt: new Date()
+
+    });
+
+    showSuccessCard(
+      "Airtime Purchase Successful"
+    );
 
     await getWallet();
 
   } catch (err) {
+
+    console.error(err);
+
     showAlert(err.message, "error");
+
   } finally {
+
+    airtimeProcessing = false;
+
+    const btn = document.getElementById("buyAirtimeBtn");
+
+    if (btn) btn.disabled = false;
+
     hideLoader();
   }
 }
-
 
 
 
