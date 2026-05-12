@@ -1451,10 +1451,205 @@ body{
       0 0 0 rgba(0,212,126,0.4);
   }
 }
+
+
+
+
+
+/* =========================
+CLASSIC CONFIRM MODAL
+========================= */
+
+.confirm-modal{
+
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,.45);
+
+  backdrop-filter:blur(8px);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  z-index:999999999;
+
+  opacity:0;
+  visibility:hidden;
+
+  transition:.35s ease;
+}
+
+.confirm-modal.active{
+
+  opacity:1;
+  visibility:visible;
+}
+
+.confirm-box{
+
+  width:100%;
+  max-width:420px;
+
+  background:white;
+
+  border-radius:32px;
+
+  padding:35px 28px;
+
+  text-align:center;
+
+  transform:translateY(40px) scale(.9);
+
+  transition:.35s ease;
+
+  box-shadow:
+  0 30px 80px rgba(0,0,0,.18);
+}
+
+.confirm-modal.active .confirm-box{
+
+  transform:translateY(0) scale(1);
+}
+
+.confirm-icon{
+
+  width:90px;
+  height:90px;
+
+  margin:auto auto 20px;
+
+  border-radius:50%;
+
+  background:linear-gradient(
+    135deg,
+    #e9fff5,
+    #d7ffec
+  );
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  font-size:42px;
+}
+
+.confirm-box h2{
+
+  font-size:28px;
+
+  color:#111827;
+
+  margin-bottom:14px;
+
+  font-weight:800;
+}
+
+.confirm-box p{
+
+  color:#666;
+
+  line-height:1.7;
+
+  font-size:15px;
+
+  margin-bottom:28px;
+
+  white-space:pre-line;
+}
+
+.confirm-actions{
+
+  display:flex;
+
+  gap:14px;
+}
+
+.confirm-btn{
+
+  flex:1;
+
+  border:none;
+
+  padding:16px;
+
+  border-radius:18px;
+
+  cursor:pointer;
+
+  font-size:15px;
+
+  font-weight:700;
+
+  transition:.3s;
+}
+
+.cancel-btn{
+
+  background:#f3f4f6;
+
+  color:#111827;
+}
+
+.cancel-btn:hover{
+
+  background:#e5e7eb;
+}
+
+.proceed-btn{
+
+  background:linear-gradient(
+    135deg,
+    #00a86b,
+    #008753
+  );
+
+  color:white;
+
+  box-shadow:
+  0 10px 25px rgba(0,168,107,.25);
+}
+
+.proceed-btn:hover{
+
+  transform:translateY(-2px);
+
+  box-shadow:
+  0 18px 35px rgba(0,168,107,.35);
+}
+
+@media(max-width:600px){
+
+  .confirm-box{
+
+    margin:20px;
+
+    padding:28px 22px;
+
+    border-radius:26px;
+  }
+
+  .confirm-actions{
+
+    flex-direction:column;
+  }
+}
+
+
 </style>
+
+
+
+
+
+
+
+
+
+
+
 </head>
-
-
 
 <nav>
   <!-- LEFT -->
@@ -3053,35 +3248,28 @@ async function confirmLogout(){
 
 
 // ===============================
-// BUY AIRTIME (FIXED VERSION)
+// BUY AIRTIME WITH CONFIRMATION
 // ===============================
 
 let airtimeProcessing = false;
 
 async function buyAirtime() {
 
-  // 🚫 Prevent double click
+  // ===============================
+  // PREVENT DOUBLE CLICK
+  // ===============================
+
   if (airtimeProcessing) {
+
     showAlert(
       "Transaction already processing...",
       "warning"
     );
+
     return;
   }
 
-  airtimeProcessing = true;
-
-  const btn =
-    document.getElementById("buyAirtimeBtn");
-
-  if (btn) {
-    btn.disabled = true;
-    btn.innerText = "Processing...";
-  }
-
   try {
-
-    showLoader("Processing Airtime...");
 
     // ===============================
     // VALIDATION
@@ -3108,14 +3296,64 @@ async function buyAirtime() {
     );
 
     if (!phone || !network || !amount) {
-      throw new Error("Fill all fields");
+
+      throw new Error(
+        "Fill all fields"
+      );
     }
+
+    // ===============================
+    // CONFIRM PURCHASE
+    // ===============================
+
+const confirmBuy =
+await showConfirmModal(
+
+  "Confirm Airtime Purchase",
+
+`Network: ${network}
+
+Phone: ${phone}
+
+Amount: ₦${amount.toLocaleString('en-NG')}
+
+Proceed with transaction?`
+
+);
+
+    if (!confirmBuy) {
+      return;
+    }
+
+    // ===============================
+    // START PROCESSING
+    // ===============================
+
+    airtimeProcessing = true;
+
+    const btn =
+      document.getElementById(
+        "buyAirtimeBtn"
+      );
+
+    if (btn) {
+
+      btn.disabled = true;
+
+      btn.innerText =
+        "Processing...";
+    }
+
+    showLoader(
+      "Processing Airtime..."
+    );
 
     // ===============================
     // UNIQUE TRANSACTION ID
     // ===============================
 
     const requestId =
+
       "AIRTIME_" +
       currentUser.uid +
       "_" +
@@ -3127,10 +3365,12 @@ async function buyAirtime() {
 
     const lockRef =
       db.collection("airtimeLocks")
-        .doc(requestId);
+      .doc(requestId);
 
     await lockRef.set({
+
       createdAt: new Date()
+
     });
 
     // ===============================
@@ -3138,25 +3378,34 @@ async function buyAirtime() {
     // ===============================
 
     const res = await fetch(
+
       "https://biva-backend-ezvu.onrender.com/api/buy-airtime",
+
       {
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+          "application/json"
         },
 
         body: JSON.stringify({
+
           phone,
           network,
           amount,
-          email: currentUser.email,
+
+          email:
+          currentUser.email,
+
           requestId
+
         })
       }
     );
 
-    const text = await res.text();
+    const text =
+      await res.text();
 
     let data;
 
@@ -3177,22 +3426,26 @@ async function buyAirtime() {
     // CHECK RESPONSE
     // ===============================
 
-    if (!res.ok || !data.success) {
+    if (
+      !res.ok ||
+      !data.success
+    ) {
 
       throw new Error(
+
         data.error ||
         "Airtime purchase failed"
+
       );
     }
 
     // ===============================
-    // SAVE TRANSACTION ONLY IF
-    // NOT ALREADY SAVED
+    // SAVE TRANSACTION
     // ===============================
 
     const txRef =
       db.collection("transactions")
-        .doc(requestId);
+      .doc(requestId);
 
     const txSnap =
       await txRef.get();
@@ -3203,21 +3456,22 @@ async function buyAirtime() {
 
         txId: requestId,
 
-        userId: currentUser.uid,
+        userId:
+        currentUser.uid,
 
-        email: currentUser.email,
+        email:
+        currentUser.email,
 
         type: "airtime",
 
         network,
-
         phone,
-
         amount,
 
         status: "success",
 
-        createdAt: new Date()
+        createdAt:
+        new Date()
 
       });
     }
@@ -3230,22 +3484,36 @@ async function buyAirtime() {
       "Airtime Purchase Successful"
     );
 
-// 🔔 SEND ADMIN NOTIFICATION
-await db.collection("adminNotifications").add({
+    // ===============================
+    // ADMIN NOTIFICATION
+    // ===============================
 
-  title: "Airtime Purchase",
+    await db.collection(
+      "adminNotifications"
+    ).add({
 
-  message:
-  `${currentUser.email} bought airtime worth ₦${Number(amount).toLocaleString('en-NG')}`,
+      title:
+      "Airtime Purchase",
 
-  type: "airtime",
+      message:
 
-  read:false,
+      `${currentUser.email} bought airtime worth ₦${Number(amount).toLocaleString('en-NG')}`,
 
-  createdAt:
-  firebase.firestore.FieldValue.serverTimestamp()
+      type: "airtime",
 
-});
+      read: false,
+
+      createdAt:
+
+      firebase.firestore
+      .FieldValue
+      .serverTimestamp()
+
+    });
+
+    // ===============================
+    // REFRESH WALLET
+    // ===============================
 
     await getWallet();
 
@@ -3267,19 +3535,30 @@ await db.collection("adminNotifications").add({
     try {
 
       const requestIdPrefix =
-        "AIRTIME_" + currentUser?.uid;
+
+        "AIRTIME_" +
+        currentUser?.uid;
 
       const snapshot =
-        await db.collection("airtimeLocks")
-          .where(
-            firebase.firestore.FieldPath.documentId(),
-            ">=",
-            requestIdPrefix
-          )
-          .get();
+
+        await db
+        .collection(
+          "airtimeLocks"
+        )
+        .where(
+          firebase.firestore
+          .FieldPath.documentId(),
+
+          ">=",
+
+          requestIdPrefix
+        )
+        .get();
 
       snapshot.forEach(doc => {
+
         doc.ref.delete();
+
       });
 
     } catch (e) {
@@ -3292,11 +3571,17 @@ await db.collection("adminNotifications").add({
 
     airtimeProcessing = false;
 
+    const btn =
+      document.getElementById(
+        "buyAirtimeBtn"
+      );
+
     if (btn) {
 
       btn.disabled = false;
 
-      btn.innerText = "Buy Airtime";
+      btn.innerText =
+        "Buy Airtime";
     }
 
     hideLoader();
@@ -3306,102 +3591,238 @@ await db.collection("adminNotifications").add({
 
 
 
+// ===============================
+// 💵 BUY DATA WITH CONFIRMATION
+// ===============================
 
-// 💵 BUY DATA
+let dataProcessing = false;
+
 async function buyData(plan) {
+
+  // ===============================
+  // PREVENT DOUBLE CLICK
+  // ===============================
+
+  if (dataProcessing) {
+
+    showAlert(
+      "Transaction already processing...",
+      "warning"
+    );
+
+    return;
+  }
 
   try {
 
-    showLoader("Processing Data...");
+    // ===============================
+    // VALIDATION
+    // ===============================
+
+    if (!currentUser) {
+
+      showAlert(
+        "Please login first",
+        "error"
+      );
+
+      return;
+    }
 
     const phone = document
       .getElementById("dataPhone")
       .value
       .trim();
 
-    if (!currentUser) {
-      showAlert("Please login first", "error");
+    if (!phone) {
+
+      showAlert(
+        "Enter phone number",
+        "error"
+      );
+
       return;
     }
 
-    if (!phone) {
-      showAlert("Enter phone number", "error");
-      return;
-    }
+// ===============================
+// CONFIRM PURCHASE
+// ===============================
+
+const confirmBuy =
+await showConfirmModal(
+
+  "Confirm Data Purchase",
+
+`Plan: ${plan.data_plan}
+
+Network: ${plan.network_id}
+
+Phone: ${phone}
+
+Amount: ₦${Number(plan.amount).toLocaleString('en-NG')}
+
+Proceed with transaction?`
+
+);
+
+if(!confirmBuy){
+  return;
+}
+
+    // ===============================
+    // START PROCESSING
+    // ===============================
+
+    dataProcessing = true;
+
+    showLoader("Processing Data...");
+
+    // ===============================
+    // CALL BACKEND
+    // ===============================
 
     const res = await fetch(
+
       "https://biva-backend-ezvu.onrender.com/api/data/buy",
+
       {
         method: "POST",
+
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type":
+          "application/json"
         },
+
         body: JSON.stringify({
-          userId: currentUser.uid,
+
+          userId:
+          currentUser.uid,
+
           phone,
-          data_plan: plan.data_plan,
-          network_id: plan.network_id
+
+          data_plan:
+          plan.data_plan,
+
+          network_id:
+          plan.network_id
+
         })
       }
     );
 
-    const text = await res.text();
+    const text =
+      await res.text();
 
     let data;
 
     try {
+
       data = JSON.parse(text);
+
     } catch (e) {
-      console.error("Invalid JSON:", text);
-      throw new Error("Server returned invalid response");
+
+      console.error(
+        "Invalid JSON:",
+        text
+      );
+
+      throw new Error(
+        "Server returned invalid response"
+      );
     }
 
-    if (!res.ok || !data.success) {
-      showAlert(data.error || "Purchase failed", "error");
+    // ===============================
+    // CHECK RESPONSE
+    // ===============================
+
+    if (
+      !res.ok ||
+      !data.success
+    ) {
+
+      showAlert(
+
+        data.error ||
+        "Purchase failed",
+
+        "error"
+      );
+
       return;
     }
 
-    // ✅ SAVE TRANSACTION FROM FRONTEND
-    await db.collection("transactions").add({
+    // ===============================
+    // SAVE TRANSACTION
+    // ===============================
 
-      userId: currentUser.uid,
+    await db.collection(
+      "transactions"
+    ).add({
 
-      email: currentUser.email,
+      userId:
+      currentUser.uid,
+
+      email:
+      currentUser.email,
 
       type: "data",
 
-      network: plan.network_id,
+      network:
+      plan.network_id,
 
-      plan: plan.data_plan,
+      plan:
+      plan.data_plan,
 
-      amount: Number(plan.amount),
+      amount:
+      Number(plan.amount),
 
       phone,
 
-      createdAt: new Date()
+      status: "success",
+
+      createdAt:
+      new Date()
 
     });
 
-    showSuccessCard("Data Purchase Successful");
+    // ===============================
+    // SUCCESS
+    // ===============================
 
+    showSuccessCard(
+      "Data Purchase Successful"
+    );
 
-// 🔔 ADMIN NOTIFICATION
-await db.collection("adminNotifications").add({
+    // ===============================
+    // ADMIN NOTIFICATION
+    // ===============================
 
-  title: "Data Purchase",
+    await db.collection(
+      "adminNotifications"
+    ).add({
 
-  message:
-  `${currentUser.email} bought ${plan.data_plan} data for ₦${Number(plan.amount).toLocaleString('en-NG')}`,
+      title:
+      "Data Purchase",
 
-  type: "data",
+      message:
 
-  read:false,
+      `${currentUser.email} bought ${plan.data_plan} data for ₦${Number(plan.amount).toLocaleString('en-NG')}`,
 
-  createdAt:
-  firebase.firestore.FieldValue.serverTimestamp()
+      type: "data",
 
-});
+      read: false,
 
+      createdAt:
+
+      firebase.firestore
+      .FieldValue
+      .serverTimestamp()
+
+    });
+
+    // ===============================
+    // REFRESH WALLET
+    // ===============================
 
     await getWallet();
 
@@ -3409,15 +3830,18 @@ await db.collection("adminNotifications").add({
 
     console.error(err);
 
-    showAlert(err.message, "error");
+    showAlert(
+      err.message,
+      "error"
+    );
 
   } finally {
 
-    hideLoader();
+    dataProcessing = false;
 
+    hideLoader();
   }
 }
-
 
 
 
@@ -3532,107 +3956,246 @@ async function loadDataPlans(network) {
 
 
 
+// ===============================
+// ⚡ PAY BILL WITH CONFIRMATION
+// ===============================
+
+let billProcessing = false;
+
 async function payBill(){
+
+  // ===============================
+  // PREVENT DOUBLE CLICK
+  // ===============================
+
+  if (billProcessing) {
+
+    showAlert(
+      "Transaction already processing...",
+      "warning"
+    );
+
+    return;
+  }
 
   try{
 
-    showLoader("Processing Bill Payment...");
-
-    const meter = document.getElementById("meterNumber").value.trim();
-
-    const disco = document.getElementById("disco").value;
-
-    const amount = Number(
-      document.getElementById("billAmount").value
-    );
+    // ===============================
+    // VALIDATION
+    // ===============================
 
     if(!currentUser){
-      showAlert("Please login first","error");
+
+      showAlert(
+        "Please login first",
+        "error"
+      );
+
       return;
     }
 
+    const meter =
+      document.getElementById(
+        "meterNumber"
+      ).value.trim();
+
+    const disco =
+      document.getElementById(
+        "disco"
+      ).value;
+
+    const amount = Number(
+
+      document.getElementById(
+        "billAmount"
+      ).value
+
+    );
+
+    if(!meter || !disco || !amount){
+
+      showAlert(
+        "Fill all fields",
+        "error"
+      );
+
+      return;
+    }
+
+
+
+// ===============================
+// CONFIRM PAYMENT
+// ===============================
+
+const confirmPay =
+await showConfirmModal(
+
+  "Confirm Electricity Payment",
+
+`Disco: ${disco}
+
+Meter Number: ${meter}
+
+Amount: ₦${amount.toLocaleString('en-NG')}
+
+Proceed with payment?`
+
+);
+
+if(!confirmPay){
+  return;
+}
+
+
+    // ===============================
+    // START PROCESSING
+    // ===============================
+
+    billProcessing = true;
+
+    showLoader(
+      "Processing Bill Payment..."
+    );
+
+    // ===============================
+    // CALL BACKEND
+    // ===============================
+
     const res = await fetch(
+
       "https://biva-backend-ezvu.onrender.com/pay-bill",
+
       {
         method:"POST",
 
         headers:{
-          "Content-Type":"application/json"
+          "Content-Type":
+          "application/json"
         },
 
         body:JSON.stringify({
+
           meter,
           disco,
           amount,
-          email: currentUser.email
+
+          email:
+          currentUser.email
+
         })
       }
     );
 
-    const data = await res.json();
+    const data =
+      await res.json();
+
+    // ===============================
+    // CHECK RESPONSE
+    // ===============================
 
     if(!res.ok){
-      showAlert(data.error || "Payment failed","error");
+
+      showAlert(
+
+        data.error ||
+        "Payment failed",
+
+        "error"
+      );
+
       return;
     }
 
+    // ===============================
     // SAVE TRANSACTION
-    await db.collection("transactions").add({
+    // ===============================
 
-      userId: currentUser.uid,
-      email: currentUser.email,
+    await db.collection(
+      "transactions"
+    ).add({
+
+      userId:
+      currentUser.uid,
+
+      email:
+      currentUser.email,
 
       type: "bill",
 
       disco,
       meter,
-
       amount,
 
-      reference: data.reference || "Electricity Payment",
+      reference:
 
-      createdAt: new Date()
+      data.reference ||
+      "Electricity Payment",
+
+      status: "success",
+
+      createdAt:
+      new Date()
 
     });
 
-    showSuccessCard("Bill Payment Successful");
+    // ===============================
+    // SUCCESS
+    // ===============================
 
+    showSuccessCard(
+      "Bill Payment Successful"
+    );
 
+    // ===============================
+    // ADMIN NOTIFICATION
+    // ===============================
 
-// 🔔 ADMIN NOTIFICATION
-await db.collection("adminNotifications").add({
+    await db.collection(
+      "adminNotifications"
+    ).add({
 
-  title: "Bill Payment",
+      title:
+      "Bill Payment",
 
-  message:
-  `${currentUser.email} paid ₦${Number(amount).toLocaleString('en-NG')} for ${disco}`,
+      message:
 
-  type: "bill",
+      `${currentUser.email} paid ₦${Number(amount).toLocaleString('en-NG')} for ${disco}`,
 
+      type: "bill",
 
-  read:false,
+      read: false,
 
+      createdAt:
 
-  createdAt:
-  firebase.firestore.FieldValue.serverTimestamp()
+      firebase.firestore
+      .FieldValue
+      .serverTimestamp()
 
-});
+    });
 
-
+    // ===============================
+    // REFRESH WALLET
+    // ===============================
 
     await getWallet();
 
-  }catch(err){
+  } catch(err){
 
-    showAlert(err.message,"error");
+    console.error(err);
 
-  }finally{
+    showAlert(
+      err.message,
+      "error"
+    );
+
+  } finally{
+
+    billProcessing = false;
 
     hideLoader();
-
   }
 }
-
 
 
 
@@ -3726,6 +4289,68 @@ function closeSuccessCard(){
     "successCard"
   ).style.display = "none";
 
+}
+
+
+
+
+
+
+
+
+
+
+
+// =========================
+// CUSTOM CONFIRM MODAL
+// =========================
+
+// GLOBAL VARIABLE
+let confirmResolver = null;
+
+
+// OPEN MODAL
+function showConfirmModal(title, message){
+
+  return new Promise((resolve)=>{
+
+    // SAVE RESOLVER
+    confirmResolver = resolve;
+
+    // SET CONTENT
+    document.getElementById(
+      "confirmTitle"
+    ).innerText = title;
+
+    document.getElementById(
+      "confirmMessage"
+    ).innerText = message;
+
+    // SHOW MODAL
+    document.getElementById(
+      "confirmModal"
+    ).classList.add("active");
+
+  });
+
+}
+
+
+// CLOSE MODAL
+function closeConfirmModal(result){
+
+  // HIDE MODAL
+  document.getElementById(
+    "confirmModal"
+  ).classList.remove("active");
+
+  // RETURN RESULT
+  if(confirmResolver){
+
+    confirmResolver(result);
+
+    confirmResolver = null;
+  }
 }
 
 
@@ -4022,6 +4647,53 @@ function closeSuccessCard(){
   </div>
 
 </div>
+
+
+
+<!-- =========================
+CLASSIC CONFIRM MODAL
+========================= -->
+
+<div class="confirm-modal" id="confirmModal">
+
+  <div class="confirm-box">
+
+    <div class="confirm-icon">
+      💳
+    </div>
+
+    <h2 id="confirmTitle">
+      Confirm Transaction
+    </h2>
+
+    <p id="confirmMessage">
+      Are you sure you want to continue?
+    </p>
+
+    <div class="confirm-actions">
+
+      <button
+        class="confirm-btn cancel-btn"
+        onclick="closeConfirmModal(false)">
+
+        Cancel
+
+      </button>
+
+      <button
+        class="confirm-btn proceed-btn"
+        onclick="closeConfirmModal(true)">
+
+        Proceed
+
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
 
 
 
