@@ -3263,25 +3263,6 @@ if (!res.ok || !data.success) {
   return;
 }
 
-// SAVE DATA TRANSACTION
-await db.collection("transactions").add({
-
-  userId: currentUser.uid,
-  email: currentUser.email,
-
-  type: "data",
-
-  network: plan.network_id,
-  plan: plan.data_plan,
-
-  amount: Number(plan.amount),
-
-  phone,
-
-  createdAt: new Date()
-
-});
-
 showSuccessCard("Data Purchase Successful");
 
 await getWallet();
