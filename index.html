@@ -3030,13 +3030,15 @@ async function confirmLogout(){
 
 
 
-// 💵 BUY AIRTIME
+// ===============================
+// BUY AIRTIME (FIXED VERSION)
+// ===============================
 
 let airtimeProcessing = false;
 
 async function buyAirtime() {
 
-  // 🚫 BLOCK MULTIPLE CLICKS
+  // 🚫 Prevent double click
   if (airtimeProcessing) {
     showAlert(
       "Transaction already processing...",
@@ -3058,6 +3060,10 @@ async function buyAirtime() {
   try {
 
     showLoader("Processing Airtime...");
+
+    // ===============================
+    // VALIDATION
+    // ===============================
 
     if (!currentUser) {
       throw new Error("Please login first");
@@ -3083,37 +3089,31 @@ async function buyAirtime() {
       throw new Error("Fill all fields");
     }
 
-    // ✅ ONE FIXED REQUEST ID
+    // ===============================
+    // UNIQUE TRANSACTION ID
+    // ===============================
+
     const requestId =
+      "AIRTIME_" +
       currentUser.uid +
       "_" +
-      phone +
-      "_" +
-      amount +
-      "_" +
-      network;
+      Date.now();
 
-    // ✅ LOCK DOCUMENT
+    // ===============================
+    // LOCK DOCUMENT
+    // ===============================
+
     const lockRef =
       db.collection("airtimeLocks")
         .doc(requestId);
 
-    const lockSnap = await lockRef.get();
-
-    if (lockSnap.exists) {
-      throw new Error(
-        "Duplicate transaction blocked"
-      );
-    }
-
-    // create lock FIRST
     await lockRef.set({
       createdAt: new Date()
     });
 
-    // =================================
-    // 🌐 CALL BACKEND
-    // =================================
+    // ===============================
+    // CALL BACKEND
+    // ===============================
 
     const res = await fetch(
       "https://biva-backend-ezvu.onrender.com/api/buy-airtime",
@@ -3139,27 +3139,45 @@ async function buyAirtime() {
     let data;
 
     try {
+
       data = JSON.parse(text);
+
     } catch (e) {
+
+      console.error(text);
+
       throw new Error(
         "Invalid server response"
       );
     }
 
+    // ===============================
+    // CHECK RESPONSE
+    // ===============================
+
     if (!res.ok || !data.success) {
+
       throw new Error(
         data.error ||
         "Airtime purchase failed"
       );
     }
 
-    // =================================
-    // ✅ SAVE TRANSACTION ONCE
-    // =================================
+    // ===============================
+    // SAVE TRANSACTION ONLY IF
+    // NOT ALREADY SAVED
+    // ===============================
 
-    await db.collection("transactions")
-      .doc(requestId)
-      .set({
+    const txRef =
+      db.collection("transactions")
+        .doc(requestId);
+
+    const txSnap =
+      await txRef.get();
+
+    if (!txSnap.exists) {
+
+      await txRef.set({
 
         txId: requestId,
 
@@ -3175,9 +3193,16 @@ async function buyAirtime() {
 
         amount,
 
+        status: "success",
+
         createdAt: new Date()
 
       });
+    }
+
+    // ===============================
+    // SUCCESS
+    // ===============================
 
     showSuccessCard(
       "Airtime Purchase Successful"
@@ -3189,21 +3214,55 @@ async function buyAirtime() {
 
     console.error(err);
 
-    showAlert(err.message, "error");
+    showAlert(
+      err.message,
+      "error"
+    );
 
   } finally {
+
+    // ===============================
+    // RELEASE LOCK
+    // ===============================
+
+    try {
+
+      const requestIdPrefix =
+        "AIRTIME_" + currentUser?.uid;
+
+      const snapshot =
+        await db.collection("airtimeLocks")
+          .where(
+            firebase.firestore.FieldPath.documentId(),
+            ">=",
+            requestIdPrefix
+          )
+          .get();
+
+      snapshot.forEach(doc => {
+        doc.ref.delete();
+      });
+
+    } catch (e) {
+
+      console.error(
+        "Failed to clear lock:",
+        e
+      );
+    }
 
     airtimeProcessing = false;
 
     if (btn) {
+
       btn.disabled = false;
+
       btn.innerText = "Buy Airtime";
     }
 
     hideLoader();
   }
 }
-
 
 
 
@@ -3258,14 +3317,35 @@ async function buyData(plan) {
       throw new Error("Server returned invalid response");
     }
 
-if (!res.ok || !data.success) {
-  showAlert(data.error || "Purchase failed", "error");
-  return;
-}
+    if (!res.ok || !data.success) {
+      showAlert(data.error || "Purchase failed", "error");
+      return;
+    }
 
-showSuccessCard("Data Purchase Successful");
+    // ✅ SAVE TRANSACTION FROM FRONTEND
+    await db.collection("transactions").add({
 
-await getWallet();
+      userId: currentUser.uid,
+
+      email: currentUser.email,
+
+      type: "data",
+
+      network: plan.network_id,
+
+      plan: plan.data_plan,
+
+      amount: Number(plan.amount),
+
+      phone,
+
+      createdAt: new Date()
+
+    });
+
+    showSuccessCard("Data Purchase Successful");
+
+    await getWallet();
 
   } catch (err) {
 
@@ -3276,9 +3356,9 @@ await getWallet();
   } finally {
 
     hideLoader();
+
   }
 }
-
 
 
 
