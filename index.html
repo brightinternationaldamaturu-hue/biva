@@ -3036,61 +3036,84 @@ let airtimeProcessing = false;
 
 async function buyAirtime() {
 
-  // 🔒 BLOCK DOUBLE CLICK
+  // 🚫 BLOCK MULTIPLE CLICKS
   if (airtimeProcessing) {
-    showAlert("Transaction already processing...", "warning");
+    showAlert(
+      "Transaction already processing...",
+      "warning"
+    );
     return;
   }
 
   airtimeProcessing = true;
 
+  const btn =
+    document.getElementById("buyAirtimeBtn");
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = "Processing...";
+  }
+
   try {
 
     showLoader("Processing Airtime...");
 
-    const phone = document.getElementById("airtimePhone").value.trim();
+    if (!currentUser) {
+      throw new Error("Please login first");
+    }
 
-    const network = document.getElementById("airtimeNetwork").value;
+    const phone =
+      document.getElementById(
+        "airtimePhone"
+      ).value.trim();
+
+    const network =
+      document.getElementById(
+        "airtimeNetwork"
+      ).value;
 
     const amount = Number(
-      document.getElementById("airtimeAmount").value
+      document.getElementById(
+        "airtimeAmount"
+      ).value
     );
 
-    if (!currentUser) {
-      showAlert("Please login first", "error");
-      return;
-    }
-
     if (!phone || !network || !amount) {
-      showAlert("Fill all fields", "error");
-      return;
+      throw new Error("Fill all fields");
     }
 
-    // ✅ UNIQUE TRANSACTION ID
-    const txId =
-      "AIRTIME_" +
+    // ✅ ONE FIXED REQUEST ID
+    const requestId =
       currentUser.uid +
       "_" +
-      Date.now();
+      phone +
+      "_" +
+      amount +
+      "_" +
+      network;
 
-    // ✅ CHECK IF TRANSACTION EXISTS
-    const txRef = db.collection("transactions").doc(txId);
+    // ✅ LOCK DOCUMENT
+    const lockRef =
+      db.collection("airtimeLocks")
+        .doc(requestId);
 
-    const existing = await txRef.get();
+    const lockSnap = await lockRef.get();
 
-    if (existing.exists) {
-      showAlert("Duplicate transaction blocked", "warning");
-      return;
+    if (lockSnap.exists) {
+      throw new Error(
+        "Duplicate transaction blocked"
+      );
     }
 
-    // ✅ DISABLE BUTTON
-    const btn = document.getElementById("buyAirtimeBtn");
+    // create lock FIRST
+    await lockRef.set({
+      createdAt: new Date()
+    });
 
-    if (btn) btn.disabled = true;
-
-    // =========================
-    // CALL BACKEND
-    // =========================
+    // =================================
+    // 🌐 CALL BACKEND
+    // =================================
 
     const res = await fetch(
       "https://biva-backend-ezvu.onrender.com/api/buy-airtime",
@@ -3106,7 +3129,7 @@ async function buyAirtime() {
           network,
           amount,
           email: currentUser.email,
-          txId
+          requestId
         })
       }
     );
@@ -3118,38 +3141,43 @@ async function buyAirtime() {
     try {
       data = JSON.parse(text);
     } catch (e) {
-      throw new Error("Invalid server response");
+      throw new Error(
+        "Invalid server response"
+      );
     }
 
     if (!res.ok || !data.success) {
       throw new Error(
-        data.error || "Airtime purchase failed"
+        data.error ||
+        "Airtime purchase failed"
       );
     }
 
-    // =========================
-    // SAVE FIREBASE RECORD ONCE
-    // =========================
+    // =================================
+    // ✅ SAVE TRANSACTION ONCE
+    // =================================
 
-    await txRef.set({
+    await db.collection("transactions")
+      .doc(requestId)
+      .set({
 
-      txId,
+        txId: requestId,
 
-      userId: currentUser.uid,
+        userId: currentUser.uid,
 
-      email: currentUser.email,
+        email: currentUser.email,
 
-      type: "airtime",
+        type: "airtime",
 
-      network,
+        network,
 
-      phone,
+        phone,
 
-      amount,
+        amount,
 
-      createdAt: new Date()
+        createdAt: new Date()
 
-    });
+      });
 
     showSuccessCard(
       "Airtime Purchase Successful"
@@ -3167,9 +3195,10 @@ async function buyAirtime() {
 
     airtimeProcessing = false;
 
-    const btn = document.getElementById("buyAirtimeBtn");
-
-    if (btn) btn.disabled = false;
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = "Buy Airtime";
+    }
 
     hideLoader();
   }
@@ -3179,6 +3208,8 @@ async function buyAirtime() {
 
 
 
+
+// 💵 BUY DATA
 async function buyData(plan) {
 
   try {
@@ -3266,6 +3297,8 @@ await getWallet();
     hideLoader();
   }
 }
+
+
 
 
 
