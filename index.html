@@ -2543,22 +2543,39 @@ if (!amount || amount <= 0) {
           throw new Error(data.error || "Wallet funding failed");
         }
 
+// ===============================
+// ADMIN NOTIFICATION
+// ===============================
+
+await db.collection(
+  "adminNotifications"
+).add({
+
+  title:
+  "Wallet Funding",
+
+  message:
+
+`${currentUser.email} funded wallet with ₦${amount.toLocaleString('en-NG')}`,
+
+  type: "fund",
+
+  read: false,
+
+  createdAt:
+
+  firebase.firestore
+  .FieldValue
+  .serverTimestamp()
+
+});
+
        showSuccessCard("Wallet funded successful");
 
         await getWallet();
 
-      } catch(err) {
-
-        console.error(err);
-
-        console.error(err);
-
-showErrorModal(
-  "Transaction Failed",
-  "Please try again later."
-);
-
-      } finally {
+      } catch(err) { }
+	finally {
 
         hideLoader();
 
