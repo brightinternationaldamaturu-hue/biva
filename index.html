@@ -2924,7 +2924,7 @@ async function buy(price, plan) {
     hideLoader();
 
     showAlert(
-      "✅ Purchase successful!"
+      "Purchase successful!"
     );
 
     document.getElementById(
@@ -3778,10 +3778,9 @@ Proceed with transaction?`
     // SUCCESS
     // ===============================
 
-    showSuccessCard(
-      "Airtime Purchase Successful"
-    );
-
+showSuccessCard(
+  `₦${amount.toLocaleString('en-NG')} airtime sent successfully`
+);
     // ===============================
     // ADMIN NOTIFICATION
     // ===============================
@@ -3815,7 +3814,7 @@ Proceed with transaction?`
 
     await getWallet();
 
-  } catch (err) {} 
+} catch (err) { }
 
 
 finally {
@@ -4800,7 +4799,7 @@ function closeErrorModal(){
   ">
 
     <h2 style="color:#8B0000;text-align:center;">
-  ✅ Purchase Successful
+  Purchase Successful
 </h2>
 
     <p><strong>Email:</strong> <span id="r_email"></span></p>
