@@ -2553,11 +2553,6 @@ if (!amount || amount <= 0) {
 
         console.error(err);
 
-showErrorModal(
-  "Transaction Failed",
-  "Please try again later."
-);
-
       } finally {
 
         hideLoader();
@@ -3517,7 +3512,7 @@ showErrorModal(
 
 
 // ===============================
-// BUY AIRTIME WITH CONFIRMATION
+// 📞 BUY AIRTIME WITH CONFIRMATION
 // ===============================
 
 let airtimeProcessing = false;
@@ -3538,8 +3533,6 @@ async function buyAirtime() {
     return;
   }
 
-  let requestId = null;
-
   try {
 
     // ===============================
@@ -3548,9 +3541,11 @@ async function buyAirtime() {
 
     if (!currentUser) {
 
-      throw new Error(
-        "Please login first"
+      showErrorModal(
+        "Please login first."
       );
+
+      return;
     }
 
     const phone =
@@ -3569,27 +3564,27 @@ async function buyAirtime() {
       ).value
     );
 
-if (
-  !phone ||
-  !network ||
-  !amount
-) {
+    if (!phone || !network || !amount) {
 
-  showErrorModal(
-    "Fill all field"
-  );
-return;
-}
+      showErrorModal(
+        "Please fill all fields."
+      );
 
-/* MINIMUM AIRTIME VALIDATION */
+      return;
+    }
 
-if (amount < 50) {
+    // ===============================
+    // MINIMUM VALIDATION
+    // ===============================
 
-  showErrorModal(
-    "Minimum Airtime Purchase is NGN50"
-  );
-return;
-}
+    if (amount < 50) {
+
+      showErrorModal(
+        "Minimum Airtime Purchase is ₦50"
+      );
+
+      return;
+    }
 
     // ===============================
     // CONFIRM PURCHASE
@@ -3620,50 +3615,20 @@ Proceed with transaction?`
 
     airtimeProcessing = true;
 
-    const btn =
-      document.getElementById(
-        "buyAirtimeBtn"
-      );
-
-    if (btn) {
-
-      btn.disabled = true;
-
-      btn.innerText =
-        "Processing...";
-    }
-
     showLoader(
       "Processing Airtime..."
     );
 
     // ===============================
-    // UNIQUE TRANSACTION ID
+    // GENERATE TRANSACTION ID
     // ===============================
 
-    requestId =
+    const requestId =
 
       "AIRTIME_" +
       currentUser.uid +
       "_" +
       Date.now();
-
-    // ===============================
-    // LOCK DOCUMENT
-    // ===============================
-
-    const lockRef =
-      db.collection("airtimeLocks")
-      .doc(requestId);
-
-    await lockRef.set({
-
-      createdAt:
-      firebase.firestore
-      .FieldValue
-      .serverTimestamp()
-
-    });
 
     // ===============================
     // CALL BACKEND
@@ -3689,6 +3654,9 @@ Proceed with transaction?`
 
           email:
           currentUser.email,
+
+          userId:
+          currentUser.uid,
 
           requestId
 
@@ -3743,54 +3711,45 @@ Proceed with transaction?`
     // SAVE TRANSACTION
     // ===============================
 
-    const txRef =
-      db.collection("transactions")
-      .doc(requestId);
+    await db.collection(
+      "transactions"
+    ).add({
 
-    const txSnap =
-      await txRef.get();
+      txId: requestId,
 
-    if (!txSnap.exists) {
+      userId:
+      currentUser.uid,
 
-      await txRef.set({
+      email:
+      currentUser.email,
 
-        txId: requestId,
+      type: "airtime",
 
-        userId:
-        currentUser.uid,
+      network,
+      phone,
+      amount,
 
-        email:
-        currentUser.email,
+      status: "success",
 
-        type: "airtime",
+      providerStatus:
+      data.status || "success",
 
-        network,
-        phone,
-        amount,
+      response:
+      data,
 
-        status: "completed",
+      createdAt:
+      new Date()
 
-        providerStatus:
-        data.status || "success",
-
-        response:
-        data,
-
-        createdAt:
-        firebase.firestore
-        .FieldValue
-        .serverTimestamp()
-
-      });
-    }
+    });
 
     // ===============================
     // SUCCESS
     // ===============================
 
-showSuccessCard(
-  `₦${amount.toLocaleString('en-NG')} airtime sent successfully`
-);
+    showSuccessCard(
+      `₦${amount.toLocaleString('en-NG')} airtime sent successfully`
+    );
+
     // ===============================
     // ADMIN NOTIFICATION
     // ===============================
@@ -3824,63 +3783,24 @@ showSuccessCard(
 
     await getWallet();
 
-} catch (err) { }
+  }
 
+  catch (err) {
 
-finally {
+    console.error(
+      "Airtime Purchase Error:",
+      err
+    );
 
-    // ===============================
-    // RELEASE LOCK
-    // ===============================
+  }
 
-    try {
-
-      if (requestId) {
-
-        await db
-        .collection(
-          "airtimeLocks"
-        )
-        .doc(requestId)
-        .delete();
-
-      }
-
-    } 
-
-catch (e) {
-
-      console.error(
-
-        "Failed to clear lock:",
-        e
-
-      );
-    }
-
-    // ===============================
-    // RESET BUTTON
-    // ===============================
+  finally {
 
     airtimeProcessing = false;
-
-    const btn =
-      document.getElementById(
-        "buyAirtimeBtn"
-      );
-
-    if (btn) {
-
-      btn.disabled = false;
-
-      btn.innerText =
-        "Buy Airtime";
-    }
 
     hideLoader();
   }
 }
-
 
 
 
