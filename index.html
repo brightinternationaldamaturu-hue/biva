@@ -2765,198 +2765,152 @@ document.getElementById("menuLogoutBtn").style.display = "none";
 
 // BUY WITH WALLET
 async function buy(price, plan) {
+if (!currentUser) {
 
-  if (!currentUser) {
-    showErrorModal("Please login first.");
-    return;
-  }
+  showErrorModal(
+    "Please login first."
+  );
+
+  return;
+}
 
   const userId = currentUser.uid;
-
   const userRef = db.collection("users").doc(userId);
-
   const lockRef = db.collection("purchaseLocks").doc(userId);
 
   const txId = "TX_" + userId + "_" + Date.now();
 
-  let walletDeducted = false;
-
   try {
-
-    showLoader(
-      "Processing Purchase",
-      "Securing payment & generating voucher..."
-    );
-
-    // =========================
-    // STEP 1: CHECK LOCK
-    // =========================
+    // 🔒 STEP 1: Acquire lock (prevents double click / parallel execution)
     const lockSnap = await lockRef.get();
 
-    if (lockSnap.exists && lockSnap.data().locked === true) {
-
-      hideLoader();
-
-      showAlert(
-        "⏳ Transaction already in progress. Please wait...",
-        "warning"
-      );
-
+    if (lockSnap.exists && lockSnap.data().locked) {
+      showAlert("⏳ Please wait, transaction already in progress", "warning");
       return;
     }
 
-    // =========================
-    // STEP 2: CREATE LOCK
-    // =========================
     await lockRef.set({
       locked: true,
-      txId,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      txId: txId,
+      createdAt: new Date()
     });
 
-    // =========================
-    // STEP 3: WALLET TRANSACTION
-    // =========================
-    await db.runTransaction(async (transaction) => {
+    // 🔄 STEP 2: Run atomic wallet transaction
+    const voucherData = await db.runTransaction(async (transaction) => {
 
       const userDoc = await transaction.get(userRef);
 
       if (!userDoc.exists) {
-        throw new Error("User account not found.");
+        throw new Error("User wallet not found");
       }
 
-      const wallet = Number(userDoc.data().wallet || 0);
+      const wallet = userDoc.data().wallet || 0;
 
       if (wallet < price) {
-        throw new Error("Insufficient wallet balance.");
+        throw new Error("Insufficient balance");
       }
 
-      // SAFE WALLET DEDUCTION
+
+
+      // Deduct wallet atomically
       transaction.update(userRef, {
         wallet: wallet - price
       });
 
+      return { walletAfter: wallet - price };
+    });
+                                      showLoader("Generating Voucher", "Please wait while we fetch your data...");
+
+    // 🌐 STEP 3: Call webhook ONLY ONCE (after successful deduction)
+    const res = await fetch("https://hook.us2.make.com/pm61x9gphx81e59lrvy1q7tmnfsd7ggo", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        plan,
+        price,
+        email: currentUser.email,
+        txId: txId
+      })
     });
 
-    walletDeducted = true;
-
-    showLoader(
-      "Generating Voucher",
-      "Please wait while we fetch your voucher..."
-    );
-
-    // =========================
-    // STEP 4: CALL WEBHOOK
-    // =========================
-    const response = await fetch(
-      "https://hook.us2.make.com/pm61x9gphx81e59lrvy1q7tmnfsd7ggo",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          txId,
-          plan,
-          price,
-          userId,
-          email: currentUser.email
-        })
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Voucher server unavailable.");
+    if (!res.ok) {
+      throw new Error("Voucher server error");
     }
 
-    const data = await response.json();
-
+    const data = await res.json();
     const voucher = data.voucher;
 
+
+
+
+await db.collection("vouchers").doc(voucher).set({
+  code: voucher,
+  plan: plan,
+  price: price,
+  used: false,
+  createdAt: new Date()
+});
+
+
+
+
+
     if (!voucher) {
-      throw new Error("Voucher generation failed.");
+      throw new Error("Voucher not received");
     }
 
-    // =========================
-    // STEP 5: PREVENT DUPLICATES
-    // =========================
+    // 🧾 STEP 4: Idempotency check (prevents duplicate voucher writing)
     const txRef = db.collection("transactions").doc(txId);
+    const txSnap = await txRef.get();
 
-    const existingTx = await txRef.get();
-
-    if (existingTx.exists) {
-      throw new Error("Duplicate transaction blocked.");
+    if (txSnap.exists) {
+      throw new Error("Duplicate transaction blocked");
     }
 
-    // =========================
-    // STEP 6: SAVE TRANSACTION
-    // =========================
+    // 💾 STEP 5: Save transaction safely
     await txRef.set({
-      txId,
       userId,
       email: currentUser.email,
       plan,
       price,
       voucher,
-      type: "voucher",
-      status: "successful",
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      type: "purchase",
+      txId,
+      createdAt: new Date()
     });
 
-    // =========================
-    // STEP 7: SAVE VOUCHER
-    // =========================
-    await db.collection("vouchers").doc(voucher).set({
-      code: voucher,
-      plan,
-      price,
-      used: false,
-      email: currentUser.email,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-
-    // =========================
-    // STEP 8: UPDATE USER
-    // =========================
+    // 🧠 STEP 6: Update last voucher
     await userRef.update({
       lastVoucher: voucher
     });
+ showLoader("Finalizing", "Almost done...");
 
-    // =========================
-    // STEP 9: ADMIN NOTIFICATION
-    // =========================
-    await db.collection("adminNotifications").add({
+    // 🎉 SUCCESS
+    showAlert("✅ Purchase successful!");
 
-      title: "Voucher Purchase",
 
-      message:
-        `${currentUser.email} bought ${plan} voucher for ₦${Number(price).toLocaleString("en-NG")}`,
 
-      type: "voucher",
+// 🔔 ADMIN NOTIFICATION
+await db.collection("adminNotifications").add({
 
-      read: false,
+  title: "Voucher Purchase",
 
-      createdAt:
-        firebase.firestore.FieldValue.serverTimestamp()
+  message:
+  `${currentUser.email} bought ${plan} voucher for ₦${Number(price).toLocaleString('en-NG')}`,
 
-    });
+  type: "voucher",
 
-    // =========================
-    // STEP 10: UI SUCCESS
-    // =========================
-    hideLoader();
+  read:false,
 
-    showAlert(
-      "✅ Purchase successful!",
-      "success"
-    );
+  createdAt:
+  firebase.firestore.FieldValue.serverTimestamp()
 
-    // SHOW ACTIVATE BUTTON
-    document.getElementById(
-      "activateBtn"
-    ).style.display = "block";
+});
 
-    // PRINT VOUCHER
+
+	// ✅ Show Activate button
+	document.getElementById("activateBtn").style.display = "block";
+
     printVoucher({
       email: currentUser.email,
       plan,
@@ -2964,78 +2918,23 @@ async function buy(price, plan) {
       voucher
     });
 
-  } catch (err) {
+} catch (err) {
 
-    console.error("PURCHASE ERROR:", err);
+  // LOG REAL ERROR
+  console.error(err);
 
-    // =========================
-    // REFUND IF FAILED
-    // =========================
-    if (walletDeducted) {
+  // SHOW CLEAN MODAL
+  showErrorModal(
+    "Something went wrong. Please try again later."
+  );
 
-      try {
-
-        await db.runTransaction(async (transaction) => {
-
-          const userDoc = await transaction.get(userRef);
-
-          if (!userDoc.exists) return;
-
-          const currentWallet =
-            Number(userDoc.data().wallet || 0);
-
-          transaction.update(userRef, {
-            wallet: currentWallet + price
-          });
-
-        });
-
-        console.log("Wallet refunded successfully.");
-
-      } catch (refundErr) {
-
-        console.error(
-          "Refund failed:",
-          refundErr
-        );
-
-      }
-
-    }
-
-    hideLoader();
-
-    showErrorModal(
-      err.message ||
-      "Something went wrong. Please try again later."
-    );
-
-  } finally {
-
-    // =========================
-    // ALWAYS RELEASE LOCK
-    // =========================
-    try {
-
-      await lockRef.update({
-        locked: false
-      });
-
-    } catch(lockErr) {
-
-      console.error(
-        "Failed to release lock:",
-        lockErr
-      );
-
-    }
-
-    hideLoader();
-
+} finally {
+    // 🔓 STEP 7: ALWAYS release lock (critical)
+    await lockRef.set({ locked: false });
+                      showLoader("Processing Purchase", "Securing payment & generating voucher...");
+                                                                          hideLoader();
   }
-
 }
-
 
 
 
