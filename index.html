@@ -2415,7 +2415,7 @@ async function signup(){
       email: user.email,
       wallet: 0,
       blocked: false,
-      createdAt: new Date()
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     showSuccessCard("Account Created Successfuly");
@@ -2593,7 +2593,7 @@ async function login(){
         email: user.email,
         wallet: 0,
         blocked: false,
-        createdAt: new Date()
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
       });
     }
 
@@ -3002,7 +3002,6 @@ function loadTransactions(uid){
 
   db.collection("transactions")
     .where("userId", "==", uid)
-    .orderBy("createdAt", "desc")
 
     .onSnapshot(snapshot => {
 
@@ -3021,18 +3020,30 @@ function loadTransactions(uid){
         return;
       }
 
-      snapshot.forEach(doc => {
+      // SAFE SORT
+      const docs = snapshot.docs.sort((a, b) => {
+
+        const aTime =
+          a.data().createdAt?.toMillis
+          ? a.data().createdAt.toMillis()
+          : 0;
+
+        const bTime =
+          b.data().createdAt?.toMillis
+          ? b.data().createdAt.toMillis()
+          : 0;
+
+        return bTime - aTime;
+
+      });
+
+      docs.forEach(doc => {
 
         const t = doc.data();
         const id = doc.id;
 
-        const date = t.createdAt?.toDate
-          ? t.createdAt.toDate().toLocaleString()
-          : "Just now";
-
         let badge = "";
         let details = "";
-        let ref = t.voucher || t.reference || "—";
 
         // =========================
         // FUND WALLET
@@ -3041,9 +3052,7 @@ function loadTransactions(uid){
 
           badge = `<span class="tx-badge tx-fund">FUND</span>`;
 
-          details = `
-            Wallet Funding
-          `;
+          details = `Wallet Funding`;
         }
 
         // =========================
@@ -3053,9 +3062,7 @@ function loadTransactions(uid){
 
           badge = `<span class="tx-badge tx-debit">VOUCHER</span>`;
 
-          details = `
-            ${t.plan || "-"}
-          `;
+          details = `${t.plan || "-"}`;
         }
 
         // =========================
@@ -3097,34 +3104,37 @@ function loadTransactions(uid){
           `;
         }
 
-body.innerHTML += `
+        body.innerHTML += `
 
-  <tr>
+          <tr>
 
-    <td>${badge}</td>
+            <td>${badge}</td>
 
-    <td>
-      ₦${Number(t.amount || t.price || 0).toLocaleString()}
-    </td>
+            <td>
+              ₦${Number(t.amount || t.price || 0).toLocaleString()}
+            </td>
 
-    <td>
+            <td>
 
-<button
-  class="btn"
-  style="padding:6px 10px;font-size:12px;"
-  onclick="viewTransaction('${id}')">
+              <button
+                class="btn"
+                style="padding:6px 10px;font-size:12px;"
+                onclick="viewTransaction('${id}')">
 
-  View
+                View
 
-</button>
+              </button>
 
-    </td>
+            </td>
 
-  </tr>
-`;
+          </tr>
+
+        `;
       });
     });
 }
+
+
 
 
 let selectedPlan = null;
@@ -3348,7 +3358,7 @@ if(!text || !currentUser){
   await ref.collection("messages").add({
     text: text,
     sender: "user",
-    createdAt: new Date()
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
   input.value = "";
@@ -3412,7 +3422,7 @@ async function sendSupportMessage(text){
   await ref.collection("messages").add({
     text: text,
     sender: "user",
-    createdAt: new Date()
+    createdAt: firebase.firestore.FieldValue.serverTimestamp()
   });
 
 }
