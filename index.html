@@ -3486,16 +3486,27 @@ async function buyAirtime() {
       ).value
     );
 
-    if (
-      !phone ||
-      !network ||
-      !amount
-    ) {
+if (
+  !phone ||
+  !network ||
+  !amount
+) {
 
-      throw new Error(
-        "Fill all fields"
-      );
-    }
+  showErrorModal(
+    "Fill all field"
+  );
+return;
+}
+
+/* MINIMUM AIRTIME VALIDATION */
+
+if (amount < 50) {
+
+  showErrorModal(
+    "Minimum Airtime Purchase is NGN50"
+  );
+return;
+}
 
     // ===============================
     // CONFIRM PURCHASE
@@ -3731,26 +3742,8 @@ Proceed with transaction?`
 
     await getWallet();
 
-  } catch (err) {
+  } catch (err) {} 
 
-    // ===============================
-    // ERROR HANDLER
-    // ===============================
-
-    console.error(
-      "AIRTIME ERROR:",
-      err
-    );
-
-    showErrorModal(
-
-      err.message ||
-
-      "Transaction Failed"
-
-    );
-
-  } 
 
 finally {
 
@@ -3771,7 +3764,9 @@ finally {
 
       }
 
-    } catch (e) {
+    } 
+
+catch (e) {
 
       console.error(
 
