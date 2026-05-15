@@ -3679,6 +3679,27 @@ BANK TRANSFER CARD
 }
 
 
+
+
+.plan-cashback{
+
+  margin-top: 6px;
+
+  font-size: 13px;
+
+  font-weight: 600;
+
+  color: #00b894;
+
+  background: rgba(0,184,148,0.1);
+
+  padding: 4px 10px;
+
+  border-radius: 20px;
+
+  display: inline-block;
+}
+
 </style>
 
 
@@ -6465,6 +6486,7 @@ function loadTransactions(uid){
       docs.forEach(doc => {
 
         const t = doc.data();
+        console.log("VIEW TRANSACTION:", t);
         const id = doc.id;
 
         let badge = "";
@@ -6627,6 +6649,36 @@ async function viewTransaction(id){
     }
 
     const t = doc.data();
+// FIX NETWORK
+const networkMap = {
+  "1": "MTN",
+  "2": "GLO",
+  "3": "AIRTEL",
+  "4": "9MOBILE"
+};
+
+if (
+  t.network &&
+  typeof t.network !== "string"
+) {
+  t.network =
+    networkMap[String(t.network)] || "Unknown";
+}
+
+if (
+  t.network_id &&
+  !t.network
+) {
+  t.network =
+    networkMap[String(t.network_id)] || "Unknown";
+}
+
+
+
+// FIX PLAN
+const plan =
+  t.plan || "Unknown Plan";
+
 
     let receiptHTML = "";
 
@@ -6679,55 +6731,101 @@ async function viewTransaction(id){
       `;
     }
 
-    // =========================
-    // DATA RECEIPT
-    // =========================
-    else if(t.type === "data"){
 
-      receiptHTML = `
 
-        <div class="receipt-card">
+// =========================
+// DATA RECEIPT
+// =========================
+else if (t.type === "data") {
 
-          <div class="receipt-success">
-            🌐
-          </div>
+  const networkMap = {
+    1: "MTN",
+    2: "GLO",
+    3: "AIRTEL",
+    4: "9MOBILE"
+  };
 
-          <h2>
-            Data Purchase
-          </h2>
+  const network =
+    t.network ||
+    networkMap[t.network_id] ||
+    "Unknown";
 
-          <div class="receipt-amount">
-            ₦${Number(t.amount || 0).toLocaleString()}
-          </div>
+  const plan =
+    t.plan || "Unknown Plan";
 
-          <div class="receipt-details">
+  const createdAt =
+    t.createdAt?.toDate
+      ? t.createdAt.toDate()
+      : new Date(t.createdAt);
 
-            <div class="receipt-row">
-              <span>Network</span>
-              <strong>${t.network || "-"}</strong>
-            </div>
+  receiptHTML = `
 
-            <div class="receipt-row">
-              <span>Plan</span>
-              <strong>${t.plan || "-"}</strong>
-            </div>
+    <div class="receipt-card">
 
-            <div class="receipt-row">
-              <span>Phone</span>
-              <strong>${t.phone || "-"}</strong>
-            </div>
+      <div class="receipt-success">
+        🌐
+      </div>
 
-            <div class="receipt-row">
-              <span>Status</span>
-              <strong>${t.status || "Successful"}</strong>
-            </div>
+      <h2>
+        Data Purchase
+      </h2>
 
-          </div>
+      <div class="receipt-amount">
+        ₦${Number(
+          t.amountCharged || t.amount || 0
+        ).toLocaleString()}
+      </div>
 
+      <div class="receipt-details">
+
+        <div class="receipt-row">
+          <span>Network</span>
+
+          <strong>
+            ${network}
+          </strong>
         </div>
 
-      `;
-    }
+        <div class="receipt-row">
+          <span>Plan</span>
+
+          <strong>
+            ${t.plan || "-"}
+          </strong>
+        </div>
+
+
+        <div class="receipt-row">
+          <span>Phone</span>
+
+          <strong>
+            ${t.phone || "-"}
+          </strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Date</span>
+
+          <strong>
+            ${createdAt.toLocaleString()}
+          </strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Status</span>
+
+          <strong>
+            ${t.status || "success"}
+          </strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+}
+
 
     // =========================
     // AIRTIME RECEIPT
@@ -6818,6 +6916,93 @@ async function viewTransaction(id){
 
       `;
     }
+
+
+
+// =========================
+// CASHBACK RECEIPT
+// =========================
+else if(t.type === "cashback"){
+
+  const createdAt =
+    t.createdAt?.toDate
+      ? t.createdAt.toDate().toLocaleString()
+      : "-";
+
+  receiptHTML = `
+
+    <div class="receipt-card">
+
+      <div class="receipt-success">
+        🎁
+      </div>
+
+      <h2>
+        Cashback Reward
+      </h2>
+
+      <div class="receipt-amount">
+        ₦${Number(
+          t.amount || 0
+        ).toLocaleString()}
+      </div>
+
+      <div class="receipt-details">
+
+        <div class="receipt-row">
+          <span>Network</span>
+
+          <strong>
+            ${t.network || "-"}
+          </strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Plan</span>
+
+          <strong>
+            ${t.plan || "-"}
+          </strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Phone</span>
+
+          <strong>
+            ${t.phone || "-"}
+          </strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Description</span>
+
+          <strong>
+            ${t.description || "Cashback Reward"}
+          </strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Status</span>
+
+          <strong>
+            ${t.status || "success"}
+          </strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Date</span>
+
+          <strong>
+            ${createdAt}
+          </strong>
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+}
 
     // SHOW RECEIPT
     showModal(receiptHTML);
@@ -7996,12 +8181,23 @@ function renderPlans(plans){
       type = "GIFTING";
     }
 
+    // PRICE
+    const amount =
+      Number(
+        plan.amount ||
+        plan.selling_price ||
+        0
+      );
+
+    // 1% CASHBACK
+    const cashback =
+      Math.floor(amount * 0.01);
+
     const card =
       document.createElement("div");
 
     card.className = "plan-card";
 
-    // IMPORTANT
     card.dataset.type = type;
 
     card.innerHTML = `
@@ -8011,11 +8207,16 @@ function renderPlans(plans){
       </div>
 
       <div class="plan-price">
-        ₦${plan.amount}
+        ₦${amount.toLocaleString()}
+      </div>
+
+      <!-- CASHBACK -->
+      <div class="plan-cashback">
+        Earn ₦${cashback} cashback
       </div>
 
       <div class="plan-validity">
-        ${plan.validity}
+        ${plan.validity || ""}
       </div>
 
       <button class="btn buy-btn">
@@ -8030,9 +8231,13 @@ function renderPlans(plans){
       e.stopPropagation();
 
       buyData({
-        data_plan: plan.id,
-        network_id: plan.network_id,
-        amount: plan.amount
+        data_plan:
+          plan.id || plan.data_plan,
+
+        network_id:
+          plan.network_id,
+
+        amount
       });
 
     };
