@@ -3992,13 +3992,17 @@ BANK TRANSFER CARD
 
   position: fixed;
 
-  top: -80px;
+  top: -70px;
 
   left: 0;
 
   width: 100%;
 
-  height: 70px;
+  height: 60px;
+
+  background: Teal;
+
+  color: #fff;
 
   display: flex;
 
@@ -4010,11 +4014,9 @@ BANK TRANSFER CARD
 
   z-index: 999999;
 
-  transition: top 0.3s ease;
+  transition: 0.3s ease;
 
   font-weight: bold;
-
-  border-radius: 0 0 18px 18px;
 
 }
 
@@ -4026,15 +4028,7 @@ BANK TRANSFER CARD
 
 .refresh-spinner{
 
-  width: 22px;
-
-  height: 22px;
-
-  border: 3px solid #fff;
-
-  border-top: 3px solid transparent;
-
-  border-radius: 50%;
+  font-size: 22px;
 
   animation: spin 1s linear infinite;
 
@@ -4042,12 +4036,15 @@ BANK TRANSFER CARD
 
 @keyframes spin{
 
-  100%{
+  from{
+    transform: rotate(0deg);
+  }
+
+  to{
     transform: rotate(360deg);
   }
 
 }
-
 </style>
 
 
