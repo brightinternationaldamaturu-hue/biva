@@ -100,7 +100,7 @@
   height: 60px;
   margin: auto;
   border-radius: 50%;
-  background: radial-gradient(circle, #ff1a1a, #8B0000);
+  background: radial-gradient(circle, #ff1a1a, Green);
   animation: pulse 1.2s infinite;
 }
 
@@ -113,8 +113,8 @@
 /* PROGRESS BAR */
 .progress-bar {
   width: 100%;
-  height: 6px;
-  background: #333;
+  height: 8px;
+  background: white;
   border-radius: 10px;
   margin-top: 20px;
   overflow: hidden;
@@ -123,7 +123,7 @@
 .progress-fill {
   width: 0%;
   height: 100%;
-  background: linear-gradient(90deg, #ff1a1a, #ff4d4d);
+  background: linear-gradient(90deg, green, green);
   transition: width 0.4s ease;
 }
 
@@ -3979,6 +3979,71 @@ BANK TRANSFER CARD
   color: #fff;
   cursor: pointer;
   white-space: nowrap;
+}
+
+
+
+
+
+
+
+
+#pullRefresh{
+
+  position: fixed;
+
+  top: -70px;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 60px;
+
+  background: #0b5cff;
+
+  color: #fff;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 10px;
+
+  z-index: 999999;
+
+  transition: 0.3s ease;
+
+  font-weight: bold;
+
+}
+
+#pullRefresh.active{
+
+  top: 0;
+
+}
+
+.refresh-spinner{
+
+  font-size: 22px;
+
+  animation: spin 1s linear infinite;
+
+}
+
+@keyframes spin{
+
+  from{
+    transform: rotate(0deg);
+  }
+
+  to{
+    transform: rotate(360deg);
+  }
+
 }
 </style>
 
@@ -10042,6 +10107,84 @@ async function copyReferral(){
   }
 
 }
+
+
+
+let startY = 0;
+
+let pulling = false;
+
+const pullRefresh =
+  document.getElementById(
+    "pullRefresh"
+  );
+
+window.addEventListener(
+  "touchstart",
+
+  e => {
+
+    if (
+      window.scrollY === 0
+    ) {
+
+      startY =
+        e.touches[0].pageY;
+
+    }
+
+  }
+);
+
+window.addEventListener(
+  "touchmove",
+
+  e => {
+
+    const currentY =
+      e.touches[0].pageY;
+
+    // PULL DOWN
+    if (
+      currentY - startY > 120 &&
+      window.scrollY === 0
+    ) {
+
+      pulling = true;
+
+      pullRefresh
+        .classList
+        .add("active");
+
+    }
+
+  }
+);
+
+window.addEventListener(
+  "touchend",
+
+  () => {
+
+    if (pulling) {
+
+      location.reload();
+
+    }
+
+    pulling = false;
+
+    setTimeout(() => {
+
+      pullRefresh
+        .classList
+        .remove("active");
+
+    }, 500);
+
+  }
+);
+
 </script>
 
 
@@ -10421,6 +10564,17 @@ ERROR MODAL
 
 
 
+<div id="pullRefresh">
+
+  <div class="refresh-spinner">
+    ⟳
+  </div>
+
+  <span>
+    Release to refresh
+  </span>
+
+</div>
 
 
 </body>
