@@ -10192,6 +10192,113 @@ window.addEventListener(
   }
 );
 
+
+
+
+
+// ===============================
+// HANDLE PHONE BACK BUTTON
+// ===============================
+
+// push first history state
+history.pushState(
+  { page: 1 },
+  "",
+  location.href
+);
+
+// listen for back press
+window.addEventListener(
+  "popstate",
+  function (event) {
+
+    // =========================
+    // CLOSE OPEN MODALS FIRST
+    // =========================
+    const modal =
+      document.querySelector(
+        ".modal.show"
+      );
+
+    if (modal) {
+
+      modal.classList.remove(
+        "show"
+      );
+
+      // keep app alive
+      history.pushState(
+        { page: 1 },
+        "",
+        location.href
+      );
+
+      return;
+    }
+
+    // =========================
+    // CLOSE MENU IF OPEN
+    // =========================
+    const menu =
+      document.querySelector(
+        ".menu-dropdown"
+      );
+
+    if (
+      menu &&
+      menu.classList.contains(
+        "active"
+      )
+    ) {
+
+      menu.classList.remove(
+        "active"
+      );
+
+      history.pushState(
+        { page: 1 },
+        "",
+        location.href
+      );
+
+      return;
+    }
+
+    // =========================
+    // SHOW EXIT MESSAGE
+    // =========================
+    if (!window.backPressedOnce) {
+
+      window.backPressedOnce = true;
+
+      showToast(
+        "Press back again to exit"
+      );
+
+      history.pushState(
+        { page: 1 },
+        "",
+        location.href
+      );
+
+      setTimeout(() => {
+
+        window.backPressedOnce =
+          false;
+
+      }, 2000);
+
+      return;
+    }
+
+    // =========================
+    // EXIT APP
+    // =========================
+    navigator.app.exitApp();
+
+  }
+);
+
 </script>
 
 
