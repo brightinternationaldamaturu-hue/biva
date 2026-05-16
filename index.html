@@ -2140,8 +2140,8 @@ ERROR MODAL
 }
 
 .ads-card p{
-  font-size:15px;
-  line-height:1.6;
+  font-size:14px;
+  line-height:1.4;
   color:#fff;
 }
 
@@ -2161,8 +2161,9 @@ ERROR MODAL
     font-size:20px;
   }
 
-  .ads-card p{
-    font-size:14px;
+.ads-card p{
+  font-size:12px;
+  font-weight:bold;
   }
 
 }
@@ -2175,7 +2176,7 @@ ERROR MODAL
   position:absolute;
 
   right:18px;
-  bottom:12px;
+  bottom:30px;
 
   font-size:60px;
 
@@ -4292,7 +4293,7 @@ BANK TRANSFER CARD
 <div class="ads-card">
   <h3>🎁 Invite & Earn ₦100</h3>
   <p>
-    Share your referral code and earn ₦100 every time your friend funds ₦800 or more.
+    Invite friends and earn ₦100 when your friend funds ₦800 or more.
   </p>
 
   <div class="ad-emoji">
@@ -8071,120 +8072,70 @@ Proceed with transaction?`
 
 
 
-async function pickContact(inputId){
+async function pickContact(inputId) {
 
-  try{
+  try {
 
-    // GET PLUGIN
-    const ContactsPlugin =
-      window.Capacitor
-      ?.Plugins
-      ?.Contacts;
+    // CHECK SUPPORT
+    if (
+      !("contacts" in navigator) ||
+      !("ContactsManager" in window)
+    ) {
 
-    console.log(
-      "PLUGIN:",
-      ContactsPlugin
-    );
-
-    if(!ContactsPlugin){
-
-      showErrorModal(
-        "Contacts plugin not found"
+      return alert(
+        "Contact Picker not supported on this device"
       );
-
-      return;
 
     }
 
-    // REQUEST PERMISSION
-    const permission =
-      await ContactsPlugin.requestPermissions();
+    // OPEN PICKER
+    const contacts =
+      await navigator.contacts.select(
 
-    console.log(
-      "PERMISSION:",
-      permission
-    );
+        ["name", "tel"],
 
-    // CHECK PERMISSION
-    if(
-      permission.contacts !== 'granted'
-    ){
+        { multiple: false }
 
-      showErrorModal(
-        "Please allow contacts permission"
       );
 
+    // NO CONTACT
+    if (!contacts.length) {
       return;
+    }
+
+    const contact = contacts[0];
+
+    let phone =
+      contact.tel?.[0] || "";
+
+    // CLEAN NUMBER
+    phone = phone
+      .replace(/\s/g, "")
+      .replace(/\-/g, "");
+
+    // CONVERT +234 TO 0
+    if (phone.startsWith("+234")) {
+
+      phone =
+        "0" + phone.slice(4);
 
     }
 
-    // LOAD CONTACTS
-    const result =
-      await ContactsPlugin.getContacts();
-
-    console.log(
-      "CONTACTS:",
-      result
-    );
-
-    if(
-      !result.contacts ||
-      result.contacts.length === 0
-    ){
-
-      showErrorModal(
-        "No contacts found"
-      );
-
-      return;
-
-    }
-
-    // PICK FIRST CONTACT
-    const contact =
-      result.contacts[0];
-
-    console.log(
-      "FIRST CONTACT:",
-      contact
-    );
-
-    // GET PHONE
-    const phone =
-      contact.phoneNumbers?.[0]?.number ||
-      contact.phones?.[0]?.number;
-
-    if(!phone){
-
-      showErrorModal(
-        "Selected contact has no phone number"
-      );
-
-      return;
-
-    }
-
-    // INSERT PHONE
+    // FILL TARGET INPUT
     document.getElementById(
       inputId
     ).value = phone;
 
-  }catch(err){
+  } catch (err) {
 
     console.log(
-      "CONTACT ERROR:",
+      "CONTACT PICKER ERROR:",
       err
-    );
-
-    showErrorModal(
-      err.message ||
-      "Failed to load contacts"
     );
 
   }
 
 }
-
 
 
 
@@ -9825,26 +9776,31 @@ async function withdrawCashback(){
       Processing...
     `;
 
-    const response = await fetch(
+const response = await fetch(
+  "https://biva-backend-ezvu.onrender.com/api/data/withdraw-cashback",
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      userId: currentUser.uid
+    })
+  }
+);
 
-      "https://biva-backend-ezvu.onrender.com/api/data/withdraw-cashback",
+// 🔥 SAFE PARSE (IMPORTANT FIX)
+let data;
+try {
+  data = await response.json();
+} catch (e) {
+  throw new Error("Server returned invalid response");
+}
 
-      {
-        method: "POST",
-
-        headers: {
-          "Content-Type":
-            "application/json"
-        },
-
-        body: JSON.stringify({
-          userId: currentUser.uid
-        })
-      }
-    );
-
-    const data =
-      await response.json();
+// check HTTP status
+if (!response.ok) {
+  throw new Error(data?.error || "Request failed");
+}
 
     // RESET BUTTON
     btn.disabled = false;
@@ -9940,7 +9896,7 @@ async function withdrawCashback(){
 
   } catch(err){
 
-    console.log(err);
+console.log("WITHDRAW ERROR:", err);
 
     // RESET BUTTON
     btn.disabled = false;
@@ -9948,25 +9904,57 @@ async function withdrawCashback(){
     btn.innerHTML =
       "Withdraw Cashback";
 
-    showModal(`
 
-      <div class="receipt-card">
+      showModal(`
 
-        <div class="receipt-failed">
-          ❌
+   <div class="receipt-card">
+
+      <div class="receipt-success">
+        💰
+      </div>
+
+      <h2>
+        Cashback Withdrawal
+      </h2>
+
+      <div class="receipt-amount">
+        ₦${Number(
+          t.amount || 0
+        ).toLocaleString()}
+      </div>
+
+      <div class="receipt-details">
+
+        <div class="receipt-row">
+          <span>Status</span>
+
+          <strong>
+            ${t.status || "success"}
+          </strong>
         </div>
 
-        <h2>
-          Network Error
-        </h2>
+        <div class="receipt-row">
+          <span>Description</span>
 
-        <p>
-          Failed to connect to server
-        </p>
+          <strong>
+            ${t.description || "-"}
+          </strong>
+        </div>
+
+        <div class="receipt-row">
+          <span>Date</span>
+
+          <strong>
+            ${createdAt.toLocaleString()}
+          </strong>
+        </div>
 
       </div>
 
-    `);
+    </div>
+
+
+      `);
   }
 }
 
