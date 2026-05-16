@@ -5183,6 +5183,45 @@ function showModal(content) {
 
 
 
+
+
+// =========================
+// AUTO LOAD REFERRAL CODE
+// =========================
+
+window.addEventListener("load", () => {
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+  const ref =
+    params.get("ref");
+
+  console.log(
+    "URL Referral:",
+    ref
+  );
+
+  if(ref){
+
+    const referralInput =
+      document.getElementById(
+        "referralCode"
+      );
+
+    if(referralInput){
+
+      referralInput.value = ref;
+
+    }
+  }
+});
+
+
+
+
 async function signup(){
 
   showLoader("Creating account...");
