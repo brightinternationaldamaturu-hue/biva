@@ -10196,107 +10196,96 @@ window.addEventListener(
 
 
 
-// ===============================
-// HANDLE PHONE BACK BUTTON
-// ===============================
 
-// push first history state
-history.pushState(
-  { page: 1 },
-  "",
-  location.href
-);
+// =============================
+// ANDROID BACK BUTTON FIX
+// =============================
 
-// listen for back press
-window.addEventListener(
-  "popstate",
-  function (event) {
+document.addEventListener(
+  "deviceready",
+  function () {
 
-    // =========================
-    // CLOSE OPEN MODALS FIRST
-    // =========================
-    const modal =
-      document.querySelector(
-        ".modal.show"
-      );
+    document.addEventListener(
+      "backbutton",
+      function (e) {
 
-    if (modal) {
+        e.preventDefault();
 
-      modal.classList.remove(
-        "show"
-      );
+        // =====================
+        // CLOSE MODAL FIRST
+        // =====================
+        const modal =
+          document.querySelector(
+            ".modal.show"
+          );
 
-      // keep app alive
-      history.pushState(
-        { page: 1 },
-        "",
-        location.href
-      );
+        if (modal) {
 
-      return;
-    }
+          modal.classList.remove(
+            "show"
+          );
 
-    // =========================
-    // CLOSE MENU IF OPEN
-    // =========================
-    const menu =
-      document.querySelector(
-        ".menu-dropdown"
-      );
+          return;
+        }
 
-    if (
-      menu &&
-      menu.classList.contains(
-        "active"
-      )
-    ) {
+        // =====================
+        // CLOSE MENU FIRST
+        // =====================
+        const menu =
+          document.querySelector(
+            ".menu-dropdown.active"
+          );
 
-      menu.classList.remove(
-        "active"
-      );
+        if (menu) {
 
-      history.pushState(
-        { page: 1 },
-        "",
-        location.href
-      );
+          menu.classList.remove(
+            "active"
+          );
 
-      return;
-    }
+          return;
+        }
 
-    // =========================
-    // SHOW EXIT MESSAGE
-    // =========================
-    if (!window.backPressedOnce) {
+        // =====================
+        // GO TO PREVIOUS PAGE
+        // =====================
+        if (
+          window.history.length > 1
+        ) {
 
-      window.backPressedOnce = true;
+          window.history.back();
 
-      showToast(
-        "Press back again to exit"
-      );
+          return;
+        }
 
-      history.pushState(
-        { page: 1 },
-        "",
-        location.href
-      );
+        // =====================
+        // DOUBLE BACK TO EXIT
+        // =====================
+        if (!window.backPressed) {
 
-      setTimeout(() => {
+          window.backPressed = true;
 
-        window.backPressedOnce =
-          false;
+          showToast(
+            "Press back again to exit"
+          );
 
-      }, 2000);
+          setTimeout(() => {
 
-      return;
-    }
+            window.backPressed =
+              false;
 
-    // =========================
-    // EXIT APP
-    // =========================
-    navigator.app.exitApp();
+          }, 2000);
 
-  }
+          return;
+        }
+
+        navigator.app.exitApp();
+
+      },
+      false
+    );
+
+  },
+  false
 );
 
 </script>
